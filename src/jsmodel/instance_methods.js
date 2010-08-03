@@ -13,14 +13,20 @@ Model.InstanceMethods = {
     this["set_"+k] = function(v)  { this.attrs[k] = v; };
   },
 
-  valid: function() {
+  valid: function(options) {
+    options = options || {};
+    if(!options.skip_callbacks){ this.constructor.trigger('before_validation', [this]); }
     this.errors = [];
-    this.constructor.validations(this, this.attrs);
+    if(this.constructor.validations){
+      this.constructor.validations(this, this.attrs);
+    }
     this.constructor.valid_required_attrs(this, this.attrs);
+    if(!options.skip_callbacks){ this.constructor.trigger('after_validation', [this]); }
     return this.errors.length < 1;
   },
 
   remove: function() {
+    this.constructor.trigger('before_remove', [this]);
     var that = this;
     var deleted_item;
     $.each(this.constructor._model_items, function(i, item){
@@ -30,7 +36,7 @@ Model.InstanceMethods = {
       }
     });
     this.constructor.write_to_store();
-    this.constructor.trigger('remove', [deleted_item[0]]);
+    this.constructor.trigger('after_remove', [deleted_item[0]]);
     return deleted_item;
   },
   
@@ -47,9 +53,8 @@ Model.InstanceMethods = {
       }
     }
     if(updated){
-      if(this.valid()){
-        this.save();
-        this.constructor.trigger('update', [this]);
+      if(this.save()){
+        this.constructor.trigger('after_update', [this]);
         return true;
       }else{
         return false;
@@ -60,11 +65,16 @@ Model.InstanceMethods = {
   
   save: function() {
     if(this.valid()) {
+      this.constructor.trigger('before_save', [this]);
       if(this.id() < 0){ // new record
         this.constructor.add(this);
       }else{ // updating an existing record
         this.constructor.write_to_store();
       }
+      this.constructor.trigger('after_save', [this]);
+      return true;
+    }else{
+      return false;
     }
   },
   

@@ -36,11 +36,12 @@ Model.ClassMethods = {
 
   add: function(model) {
     if(model.valid()){
+      this.trigger('before_add', [model]);
       // set the model id before saving it
       model.attrs.id = this.next_id();
       this._model_items.push(model);
       this.write_to_store();
-      this.trigger('add', [model]);
+      this.trigger('after_add', [model]);
     }
   },
   
@@ -57,8 +58,8 @@ Model.ClassMethods = {
   
   load: function() {
     var that = this;
-    if (HTH.Storage.contains('hth'+this.model_name)) {
-      var items = HTH.Storage.getObject('hth'+this.model_name);
+    if (Model.Storage.contains(this.model_name)) {
+      var items = Model.Storage.getObject(this.model_name);
       $.each(items, function(i, item) {
         var tmp = new that(item);
       });
@@ -68,7 +69,17 @@ Model.ClassMethods = {
   },
   
   write_to_store: function() {
-    HTH.Storage.setObject('hth'+this.model_name, $.map(this._model_items, function(o){ if(o.valid()){ return o.flatten(); }}));
+    Model.Storage.setObject(
+      this.model_name,
+      $.map(
+        this._model_items,
+        function(o){
+          if(o.valid({ 'skip_callbacks': true })){
+            return o.flatten();
+          }
+        }
+      )
+    );
   }
   
 };
