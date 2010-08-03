@@ -1,4 +1,8 @@
+//= require <vendor/jquery-1.3.1>
+
 var Model = function(name, options) {
+  
+  options               = options                   || {};
   var class_methods     = options.class_methods     || {};
   var instance_methods  = options.instance_methods  || {};
   var required_attrs    = options.required_attrs    || [];
@@ -23,7 +27,7 @@ var Model = function(name, options) {
     
     // create getters and setters for the attributes
     for(var key in attributes){
-      if (attributes.hasOwnProperty(key)) {
+      if(attributes.hasOwnProperty(key)) {
         this.add_getter_setter(key, attributes[key]);
       }
     }
@@ -35,7 +39,7 @@ var Model = function(name, options) {
     
     // set attributes
     for(var key in attributes){
-      if (attributes.hasOwnProperty(key)) {
+      if(attributes.hasOwnProperty(key)) {
         this["set_"+key](attributes[key]);
       }
     }
