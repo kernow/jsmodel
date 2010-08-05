@@ -44,7 +44,7 @@ var Model = function(name, options) {
       }
     }
     
-    this.constructor.add(this);
+    this.save();
   };
   
   model.model_name = name;

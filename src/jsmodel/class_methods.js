@@ -35,7 +35,7 @@ Model.ClassMethods = {
   },
 
   add: function(model) {
-    if(model.valid()){
+    if(model.valid({ 'skip_callbacks': true })){
       this.trigger('before_add', [model]);
       // set the model id before saving it
       model.attrs.id = this.next_id();
