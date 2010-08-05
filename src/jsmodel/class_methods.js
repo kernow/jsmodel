@@ -33,6 +33,10 @@ Model.ClassMethods = {
       return options_has_properties ? true : false;
     });
   },
+  
+  first: function(){
+    return this._model_items[0];
+  },
 
   add: function(model) {
     if(model.valid({ 'skip_callbacks': true })){

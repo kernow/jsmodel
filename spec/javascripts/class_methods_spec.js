@@ -56,6 +56,36 @@ describe("class methods", function() {
     });
   }); // end describe
   
+  describe("first", function() {
+    
+    afterEach(function() {
+      User.reset();
+    }); // end after
+    
+    describe("when items exist", function() {
+      
+      beforeEach(function() {
+        user1 = new User({ name: 'Bill',  age: 12 });
+        user2 = new User({ name: 'Ben',   age: 12 });
+        user3 = new User({ name: 'Bob',   age: 99 });
+      }); // end before
+      
+      it("should return the first record", function() {
+        expect(User.first().get_name()).toEqual('Bill');
+      }); // end it
+      
+    }); // end describe
+    
+    describe("when no items exist", function() {
+      
+      it("should return undefined", function() {
+        expect(User.first()).toBeUndefined();
+      }); // end it
+      
+    }); // end describe
+    
+  }); // end describe
+  
   describe("reset", function() {
     
     beforeEach(function() {
