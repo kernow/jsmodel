@@ -8,7 +8,9 @@ var Model = function(name, options) {
   var required_attrs    = options.required_attrs    || [];
   var default_attrs     = options.default_attrs     || [];
   
-  var model = function(attributes){
+  var model = function(attributes, options){
+    options           = options           || {};
+    options.skip_save = options.skip_save || false;
     attributes  = attributes || {};
     this.attrs  = {}; // model attributes object
     this.errors = []; // validation errors array
@@ -44,7 +46,9 @@ var Model = function(name, options) {
       }
     }
     
-    this.save();
+    if(!options.skip_save){
+      this.save();
+    }
   };
   
   model.model_name = name;

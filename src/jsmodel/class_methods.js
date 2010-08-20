@@ -65,7 +65,8 @@ Model.ClassMethods = {
     if (Model.Storage.contains(this.model_name)) {
       var items = Model.Storage.getObject(this.model_name);
       $.each(items, function(i, item) {
-        var tmp = new that(item);
+        var model = new that(item, { skip_save: true });
+        that._model_items.push(model);
       });
     } else {
       this.reset();
