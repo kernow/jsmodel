@@ -1,5 +1,3 @@
-require File.join(File.dirname(__FILE__),".bundle","environment")
-Bundler.require
 
 namespace :jasmine do
   require 'jasmine'
