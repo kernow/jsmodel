@@ -1,10 +1,14 @@
 describe("class methods", function() {
   
-  var User;
+  var User, user1, user2, user3;
   
   beforeEach(function() {
     User = Model('user');
   });
+  
+  afterEach(function() {
+    User.reset();
+  }); // end after
   
   describe("all", function() {
     
@@ -104,9 +108,28 @@ describe("class methods", function() {
   
   describe("load", function() {
     
+    beforeEach(function() {
+      user1 = new User({ name: 'Bill' });
+      user2 = new User({ name: 'Ben' });
+      user3 = new User({ name: 'Bob' });
+    }); // end before
+    
+    it("should load records from local storage", function() {
+      // clear the records from memory but not local storage
+      User._model_items = [];
+      User.load();
+      
+      expect(User.all().length).toEqual(3);
+    }); // end it
+    
+    it("should clear records from memory before loading", function() {
+      User.load();
+      expect(User.all().length).toEqual(3);
+    }); // end it
+    
   }); // end describe
   
-  describe("write_to_store", function() {
+  xdescribe("write_to_store", function() {
     
   }); // end describe
 }); // end describe
