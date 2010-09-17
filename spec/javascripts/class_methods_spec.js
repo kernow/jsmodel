@@ -127,6 +127,12 @@ describe("class methods", function() {
       expect(User.all().length).toEqual(3);
     }); // end it
     
+    it("should raise an after_load event for each record loaded", function() {
+      var user_mock = new Mock(User);
+      User.expects('trigger').passing('after_load', Match.an_array).times(3);
+      User.load();
+    }); // end it
+    
   }); // end describe
   
   xdescribe("write_to_store", function() {
