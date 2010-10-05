@@ -159,6 +159,12 @@ describe('Model', function () {
       expect(user.errors[0].age).toEqual('must be a number');
     }); // end it
     
+    it("should pass when a requires attribute is set to 0 or an empty string", function() {
+      user = new User({ full_name: '', title: '', age: 3 });
+      expect(user.valid()).toBeTruthy();
+      expect(user.errors.length).toEqual(0);
+    }); // end it
+    
   }); // end describe
   
   describe("defining multiple models", function() {

@@ -7,7 +7,7 @@ Model.ClassMethods = {
     $.each(this.required_attrs, function(i,v){ required_attrs[v] = undefined; });
     for(var key in required_attrs){
       if (required_attrs.hasOwnProperty(key)) {
-        if(!model.attrs[key]){
+        if(typeof model.attrs[key] == 'undefined'){
           var obj = {};
           obj[key] = 'is required';
           model.errors.push(obj);

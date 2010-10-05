@@ -16,7 +16,7 @@ var Model = function(name, options) {
     this.errors = []; // validation errors array
     
     $.each(this.constructor.required_attrs, function(i,v){
-      if(!attributes[v]){
+      if(typeof attributes[v] == 'undefined'){
         attributes[v] = undefined;
       }
     });
