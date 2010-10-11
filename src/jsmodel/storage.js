@@ -1,5 +1,3 @@
-//= require <vendor/jquery.cookie>
-
 Model.Storage = {
   // TODO Add support for storage event
 

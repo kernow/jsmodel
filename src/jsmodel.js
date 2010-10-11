@@ -1,5 +1,3 @@
-//= require <vendor/jquery-1.3.1>
-
 var Model = function(name, options) {
   
   options               = options                   || {};
