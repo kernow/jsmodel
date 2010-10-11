@@ -34,7 +34,12 @@ Model.Storage = {
 
   getItem: function (key) {
     if (this.sessionStorage) {
-      return this.sessionStorage.getItem(key);
+      var item = this.sessionStorage.getItem(key);
+      if(typeof item.value == 'undefined'){
+        return item;
+      } else {
+        return item.value;
+      }
     } else {
       return jQuery.cookie(key);
     }
@@ -87,7 +92,7 @@ Model.Storage = {
 
   getObject: function (key) {
     if (this.contains(key)) {
-      return JSON.parse(this.getItem(key));      
+      return JSON.parse(this.getItem(key));
     } else {
       return null;
     }
