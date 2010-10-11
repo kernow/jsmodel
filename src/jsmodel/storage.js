@@ -35,7 +35,7 @@ Model.Storage = {
   getItem: function (key) {
     if (this.sessionStorage) {
       var item = this.sessionStorage.getItem(key);
-      if(typeof item.value == 'undefined'){
+      if(typeof item.value == 'undefined'){ // FF 3.0 impliments .value
         return item;
       } else {
         return item.value;
