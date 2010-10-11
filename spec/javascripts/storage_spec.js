@@ -6,7 +6,7 @@ describe("Model.Storage", function() {
     Model.Storage.clear();
   });
 
-  describe("HTML5 localStorage standard API", function() {
+  describe("HTML5 sessionStorage standard API", function() {
     // Test criteria extracted from http://dev.w3.org/html5/webstorage/#storage
 
     describe("length", function() {
@@ -129,7 +129,7 @@ describe("Model.Storage", function() {
     
   });
 
-  describe("HTML5 localStorage extended API", function() {
+  describe("HTML5 sessionStorage extended API", function() {
 
     // like getItem for JSON objects
     describe("getObject(key)", function() {

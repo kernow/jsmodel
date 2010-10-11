@@ -3,10 +3,10 @@
 Model.Storage = {
   // TODO Add support for storage event
 
-  // localStorage should work for Safari 4, Chrome 4, Firefox 3.5, IE 8 and Opera 10.5
-  localStorage: window.localStorage ? window.localStorage : null,
+  // sessionStorage should work for Safari 4, Chrome 4, Firefox 3.5, IE 8 and Opera 10.5
+  sessionStorage: window.sessionStorage ? window.sessionStorage : null,
 
-  // Fallback to cookies if HTML5 localStorage unavailable
+  // Fallback to cookies if HTML5 sessionStorage unavailable
   // in which case we need to keep a list of cookie keys
   keys: [],
 
@@ -15,8 +15,8 @@ Model.Storage = {
 
   // Define getter for length attribute
   length: function() {
-    if (this.localStorage) {
-      return this.localStorage.length;
+    if (this.sessionStorage) {
+      return this.sessionStorage.length;
     } else {
       return this.keys.length;
     }
@@ -26,8 +26,8 @@ Model.Storage = {
     if (index >= this.length()) {
       return null;
     } else {
-      if (this.localStorage) {
-        return this.localStorage.key(index);
+      if (this.sessionStorage) {
+        return this.sessionStorage.key(index);
       } else {
         return this.keys[index];        
       }
@@ -35,17 +35,17 @@ Model.Storage = {
   },
 
   getItem: function (key) {
-    if (this.localStorage) {
-      return this.localStorage.getItem(key);
+    if (this.sessionStorage) {
+      return this.sessionStorage.getItem(key);
     } else {
       return jQuery.cookie(key);
     }
   },
 
   setItem: function (key, value) {
-    if (this.localStorage) {
-      this.localStorage.removeItem(key); // Added in to try and fix support on the iPad
-      this.localStorage.setItem(key, value);
+    if (this.sessionStorage) {
+      this.sessionStorage.removeItem(key); // Added in to try and fix support on the iPad
+      this.sessionStorage.setItem(key, value);
     } else {
       jQuery.cookie(key, value);
       if (!this.contains(key)) {
@@ -55,8 +55,8 @@ Model.Storage = {
   },
 
   removeItem: function (key) {
-    if (this.localStorage) {
-      this.localStorage.removeItem(key);
+    if (this.sessionStorage) {
+      this.sessionStorage.removeItem(key);
     } else {
       for (var k = 0; k < this.length(); k++) {
         if (this.keys[k] == key) {
@@ -74,8 +74,8 @@ Model.Storage = {
   },
 
   clear: function () {
-    if (this.localStorage) {
-      this.localStorage.clear();
+    if (this.sessionStorage) {
+      this.sessionStorage.clear();
     } else {
       for (k = 0; k < this.length(); k++) {
         jQuery.cookie(this.keys[k], null);
