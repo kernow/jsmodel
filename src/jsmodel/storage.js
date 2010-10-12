@@ -2,7 +2,7 @@ Model.Storage = {
   // TODO Add support for storage event
 
   // sessionStorage should work for Safari 4, Chrome 4, Firefox 3.5, IE 8 and Opera 10.5
-  sessionStorage: window.sessionStorage ? window.sessionStorage : null,
+  sessionStorage: typeof window.sessionStorage != 'undefined' ? window.sessionStorage : null,
 
   // Fallback to cookies if HTML5 sessionStorage unavailable
   // in which case we need to keep a list of cookie keys
@@ -35,7 +35,9 @@ Model.Storage = {
   getItem: function (key) {
     if (this.sessionStorage) {
       var item = this.sessionStorage.getItem(key);
-      if(typeof item.value == 'undefined'){ // FF 3.0 impliments .value
+      if(item === null){
+        return item;
+      }else if(typeof item.value == 'undefined'){ // FF 3.0 impliments .value
         return item;
       } else {
         return item.value;
@@ -78,7 +80,19 @@ Model.Storage = {
 
   clear: function () {
     if (this.sessionStorage) {
-      this.sessionStorage.clear();
+      if(typeof this.sessionStorage.clear != "undefined"){
+        this.sessionStorage.clear();
+      }else{ // FF 3.0 doesn't support the clear method so we need to impliment it
+        var len = this.sessionStorage.length;
+        var keys = [];
+        for(i=0;i<len;i++){
+          keys.push(this.sessionStorage.key(i));
+        }
+        var self = this;
+        $.each(keys, function(i, key){
+          self.sessionStorage.removeItem(key);
+        });
+      }
     } else {
       for (k = 0; k < this.length(); k++) {
         jQuery.cookie(this.keys[k], null);
