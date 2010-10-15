@@ -152,6 +152,27 @@ describe('Model', function () {
       expect(user.errors[1].age).toEqual('is required');
     }); // end it
     
+    it("should not pass when full_name is blank", function() {
+      user = new User({ full_name: '', title: 'Mr', age: 32 });
+      expect(user.valid()).toBeFalsy();
+      expect(user.errors.length).toEqual(1);
+      expect(user.errors[0].full_name).toEqual('cannot be blank');
+    }); // end it
+    
+    it("should not pass when title is blank", function() {
+      user = new User({ full_name: 'Jamie Dyer', title: '', age: 32 });
+      expect(user.valid()).toBeFalsy();
+      expect(user.errors.length).toEqual(1);
+      expect(user.errors[0].title).toEqual('cannot be blank');
+    }); // end it
+    
+    it("should not pass when age is blank", function() {
+      user = new User({ full_name: 'Jamie Dyer', title: 'Mr', age: '' });
+      expect(user.valid()).toBeFalsy();
+      expect(user.errors.length).toEqual(1);
+      expect(user.errors[0].age).toEqual('cannot be blank');
+    }); // end it
+    
     it("should not pass when age is not a number", function() {
       user = new User({ full_name: 'Jamie Dyer', title: 'Mr', age: 'fifteen' });
       expect(user.valid()).toBeFalsy();
@@ -159,8 +180,8 @@ describe('Model', function () {
       expect(user.errors[0].age).toEqual('must be a number');
     }); // end it
     
-    it("should pass when a requires attribute is set to 0 or an empty string", function() {
-      user = new User({ full_name: '', title: '', age: 3 });
+    it("should pass when a requires attribute is set to 0", function() {
+      user = new User({ full_name: 0, title: 0, age: 0 });
       expect(user.valid()).toBeTruthy();
       expect(user.errors.length).toEqual(0);
     }); // end it

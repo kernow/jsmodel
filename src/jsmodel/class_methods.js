@@ -11,6 +11,10 @@ Model.ClassMethods = {
           var obj = {};
           obj[key] = 'is required';
           model.errors.push(obj);
+        } else if(model.attrs[key] === ''){
+          var obj = {};
+          obj[key] = 'cannot be blank';
+          model.errors.push(obj);
         }
       }
     }
