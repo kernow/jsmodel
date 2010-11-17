@@ -177,6 +177,20 @@ describe("Model.Storage", function() {
           expect(Model.Storage.getObject("test key")).toEqual(null);
         });
       });
+      
+      describe("when the value is a date", function() {
+        var date;
+        
+        beforeEach(function() {
+          date = new Date();
+          date.setMilliseconds(0);
+          Model.Storage.setObject("test key", date);
+        });
+        
+        it("should be revived", function() {
+          expect(Model.Storage.getObject("test key")).toEqual(date);
+        });
+      });
     });
 
     // like setItem for JSON objects
