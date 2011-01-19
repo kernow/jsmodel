@@ -14,13 +14,40 @@ Model.InstanceMethods = {
   },
   
   add_belongs_to: function(k) {
-    // getters and setters for association
     this['get_'+k] = function(){
       return Model.find_by_name(k).find({ id: this.attrs[k+'_id'] })[0];
     };
-    // getters and setters for association
     this['set_'+k] = function(model){
       this.attrs[k+'_id'] = model.id();
+    };
+  },
+  
+  add_has_many: function(k) {
+    var self = this;
+    this['get_'+k] = function(){
+      var obj = {};
+      obj[self.constructor.model_name+'_id'] = this.id();
+      return Model.find_by_name(k.singularize()).find(obj);
+    };
+    this['set_'+k] = function(models){
+      // remove all associations
+      var obj = {};
+      obj[self.constructor.model_name+'_id'] = this.id();
+      $.each(Model.find_by_name(k.singularize()).find(obj), function(i,model){
+        model['set_'+self.constructor.model_name+'_id'](undefined);
+      });
+      // then add the new ones
+      this['add_'+k](models);
+    };
+    this['add_'+k] = function(models){
+      $.each(models, function(i,model){
+        model['set_'+self.constructor.model_name+'_id'](self.id());
+      });
+    };
+    this['remove_'+k] = function(models){
+      $.each(models, function(i,model){
+        model['set_'+self.constructor.model_name+'_id'](undefined);
+      });
     };
   },
 

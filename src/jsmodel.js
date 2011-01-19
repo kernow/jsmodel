@@ -6,6 +6,7 @@ var Model = function(name, options) {
   var required_attrs    = options.required_attrs    || [];
   var default_attrs     = options.default_attrs     || [];
   var belongs_to        = options.belongs_to        || [];
+  var has_many          = options.has_many          || [];
   
   var model = function(attributes, options){
     options           = options           || {};
@@ -16,13 +17,18 @@ var Model = function(name, options) {
     
     var self = this;
     
-    // setup belongs_to associations
+    // create belongs_to associations
     $.each(this.constructor.belongs_to, function(i,v){
       // attribute for storing associated model id
       if(!attributes[v+'_id']){
         attributes[v+'_id'] = undefined;
       }
       self.add_belongs_to(v);
+    });
+    
+    // create has_many associations
+    $.each(this.constructor.has_many, function(i,v){
+      self.add_has_many(v);
     });
     
     $.each(this.constructor.required_attrs, function(i,v){
@@ -71,6 +77,7 @@ var Model = function(name, options) {
                 { required_attrs: required_attrs,
                   default_attrs:  default_attrs,
                   belongs_to:     belongs_to,
+                  has_many:       has_many,
                   events:         {},
                   _model_items:   []
                 }
@@ -92,7 +99,6 @@ Model.find_by_name = function(name){
 Model._models = {};
 
 Model._add = function(obj, name){
-  // console.log(models);
   Model._models[name] = obj;
 };
 
