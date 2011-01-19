@@ -28,7 +28,7 @@ var Model = function(name, options) {
     // create getters and setters for the attributes
     for(var key in attributes){
       if(attributes.hasOwnProperty(key)) {
-        this.add_getter_setter(key, attributes[key]);
+        this.add_getter_setter(key);
       }
     }
     

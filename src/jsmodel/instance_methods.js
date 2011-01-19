@@ -8,7 +8,7 @@ Model.InstanceMethods = {
     }
   },
   
-  add_getter_setter: function(k,v) {
+  add_getter_setter: function(k) {
     this["get_"+k] = function()   { return this.attrs[k]; };
     this["set_"+k] = function(v)  { this.attrs[k] = v; };
   },
