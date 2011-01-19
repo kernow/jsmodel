@@ -5,6 +5,7 @@ var Model = function(name, options) {
   var instance_methods  = options.instance_methods  || {};
   var required_attrs    = options.required_attrs    || [];
   var default_attrs     = options.default_attrs     || [];
+  var belongs_to        = options.belongs_to        || [];
   
   var model = function(attributes, options){
     options           = options           || {};
@@ -12,6 +13,17 @@ var Model = function(name, options) {
     attributes  = attributes || {};
     this.attrs  = {}; // model attributes object
     this.errors = []; // validation errors array
+    
+    var self = this;
+    
+    // setup belongs_to associations
+    $.each(this.constructor.belongs_to, function(i,v){
+      // attribute for storing associated model id
+      if(!attributes[v+'_id']){
+        attributes[v+'_id'] = undefined;
+      }
+      self.add_belongs_to(v);
+    });
     
     $.each(this.constructor.required_attrs, function(i,v){
       if(typeof attributes[v] == 'undefined'){
@@ -52,10 +64,38 @@ var Model = function(name, options) {
   model.model_name = name;
   
   // add class methods
-  jQuery.extend(model, Model.Events, Model.ClassMethods, class_methods, { required_attrs: required_attrs, default_attrs: default_attrs, events: {}, _model_items: [] });
+  jQuery.extend(model,
+                Model.Events,
+                Model.ClassMethods,
+                class_methods,
+                { required_attrs: required_attrs,
+                  default_attrs:  default_attrs,
+                  belongs_to:     belongs_to,
+                  events:         {},
+                  _model_items:   []
+                }
+  );
   
   // add instance methods
   jQuery.extend(model.prototype, Model.InstanceMethods, instance_methods);
   
+  Model._add(model, name);
+  
   return model;
+};
+
+Model.find_by_name = function(name){
+  return Model._models[name];
+};
+
+// private attributes and methods
+Model._models = {};
+
+Model._add = function(obj, name){
+  // console.log(models);
+  Model._models[name] = obj;
+};
+
+Model._remove = function(name){
+  Model._models[name] = undefined;
 };

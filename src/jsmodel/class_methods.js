@@ -75,6 +75,7 @@ Model.ClassMethods = {
   reset: function() {
     this._model_items = [];
     this.write_to_store();
+    Model._remove(this.model_name);
   },
   
   load: function() {

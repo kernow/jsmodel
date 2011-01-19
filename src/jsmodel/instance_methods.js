@@ -12,6 +12,17 @@ Model.InstanceMethods = {
     this["get_"+k] = function()   { return this.attrs[k]; };
     this["set_"+k] = function(v)  { this.attrs[k] = v; };
   },
+  
+  add_belongs_to: function(k) {
+    // getters and setters for association
+    this['get_'+k] = function(){
+      return Model.find_by_name(k).find({ id: this.attrs[k+'_id'] })[0];
+    };
+    // getters and setters for association
+    this['set_'+k] = function(model){
+      this.attrs[k+'_id'] = model.id();
+    };
+  },
 
   valid: function(options) {
     options = options || {};
