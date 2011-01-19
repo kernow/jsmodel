@@ -3,6 +3,7 @@ src_files:
  - vendor/jquery-1.3.1.js
  - vendor/jquery.cookie.js
  - vendor/jsmocha-min.js
+ - vendor/inflection.js
  - src/**/*.js
 
 #  Return an array of stylesheet filepaths relative to src_dir to include before jasmine specs.
