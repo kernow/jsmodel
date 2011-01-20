@@ -91,7 +91,11 @@ var Model = function(name, options) {
   );
   
   // add instance methods
-  jQuery.extend(model.prototype, Model.InstanceMethods, instance_methods);
+  jQuery.extend(model.prototype,
+                Model.InstanceMethods,
+                Model.Associations,
+                instance_methods
+  );
   
   Model._add(model, name);
   
