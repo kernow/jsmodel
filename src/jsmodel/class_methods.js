@@ -57,11 +57,11 @@ Model.ClassMethods = {
 
   add: function(model) {
     if(model.valid({ 'skip_callbacks': true })){
-      this.trigger('before_add', [model]);
       // set the model id before saving it
-      model.attrs.id = this.next_id();
+      this.trigger('before_add', [model]);
       this._model_items.push(model);
       this.write_to_store();
+      model.state = 'saved';
       this.trigger('after_add', [model]);
     }
   },

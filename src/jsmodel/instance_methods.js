@@ -17,8 +17,14 @@ Model.InstanceMethods = {
     this['get_'+k] = function(){
       return Model.find_by_name(k).find({ id: this.attrs[k+'_id'] })[0];
     };
+    this['get_'+k+'_id'] = function(){
+      return this.attrs['get_'+k+'_id'];
+    };
     this['set_'+k] = function(model){
       this.attrs[k+'_id'] = model.id();
+    };
+    this['set_'+k+'_id'] = function(v){
+      this.attrs[k+'_id'] = v;
     };
   },
   
@@ -104,7 +110,7 @@ Model.InstanceMethods = {
   save: function() {
     if(this.valid()) {
       this.constructor.trigger('before_save', [this]);
-      if(this.id() < 0){ // new record
+      if(this.state == 'new'){ // new record
         this.constructor.add(this);
       }else{ // updating an existing record
         this.constructor.write_to_store();
