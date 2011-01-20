@@ -14,22 +14,9 @@ var Model = function(name, options) {
     attributes  = attributes || {};
     this.attrs  = {}; // model attributes object
     this.errors = []; // validation errors array
+    this.state  = 'new';
     
     var self = this;
-    
-    // create belongs_to associations
-    $.each(this.constructor.belongs_to, function(i,v){
-      // attribute for storing associated model id
-      if(!attributes[v+'_id']){
-        attributes[v+'_id'] = undefined;
-      }
-      self.add_belongs_to(v);
-    });
-    
-    // create has_many associations
-    $.each(this.constructor.has_many, function(i,v){
-      self.add_has_many(v);
-    });
     
     $.each(this.constructor.required_attrs, function(i,v){
       if(typeof attributes[v] == 'undefined'){
@@ -50,10 +37,23 @@ var Model = function(name, options) {
       }
     }
     
+    // create belongs_to associations
+    $.each(this.constructor.belongs_to, function(i,v){
+      self.add_belongs_to(v);
+    });
+    
+    // create has_many associations
+    $.each(this.constructor.has_many, function(i,v){
+      self.add_has_many(v);
+    });
+    
     // apply any custom getters and setters
     if(this.constructor.define_getters_setters){
       this.constructor.define_getters_setters(this);
     }
+    
+    // set the models id
+    this.attrs.id = this.constructor.next_id();
     
     // set attributes
     for(var key in attributes){
