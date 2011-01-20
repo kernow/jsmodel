@@ -152,6 +152,70 @@ describe("associations", function() {
       expect(pjc_room.get_users().length).toEqual(0);
     }); // end it
     
+    describe("at creation", function() {
+      
+      var awesome_room;
+      
+      beforeEach(function() {
+        awesome_room = new Room({ name: 'Awesome Room', users: [jamie, eddie] });
+      }); // end before
+      
+      it("should be able to set the room when creating a user", function() {
+        expect(awesome_room.get_users().length).toEqual(2);
+        expect(awesome_room.get_users()[0].get_name()).toEqual('Jamie Dyer');
+        expect(awesome_room.get_users()[1].get_name()).toEqual('Eddie Vedder');
+      }); // end it
+      
+    }); // end describe
+    
+  }); // end describe
+  
+  describe("has_many and belongs_to", function() {
+    
+    var Keycard, pjc_key1, pjc_key2, diy_key1, diy_key2;
+    
+    beforeEach(function() {
+      User = Model('user', {
+        belongs_to: ['room'],
+        has_many:   ['keycards']
+      });
+      Room = Model('room', {
+        has_many: ['users', 'keycards']
+      });
+      Keycard = Model('keycard', {
+        belongs_to: ['user', 'room']
+      });
+      
+      jamie    = new User({ name: 'Jamie Dyer' });
+      frank    = new User({ name: 'Frank Spencer' });
+      eddie    = new User({ name: 'Eddie Vedder' });
+      
+      pjc_room = new Room({ name: 'Pearl Jam concert',  users: [jamie, eddie] });
+      diy_room = new Room({ name: 'DIY Enthusiasts',    users: [frank] });
+      
+      pjc_key1 = new Keycard({ code: '1234', user: jamie, room: pjc_room });
+      pjc_key2 = new Keycard({ code: '5678', user: eddie, room: pjc_room });
+      pjc_key3 = new Keycard({ code: '5678',              room: pjc_room });
+      diy_key1 = new Keycard({ code: '4321', user: frank, room: diy_room });
+      diy_key2 = new Keycard({ code: '8765',              room: diy_room });
+    });
+    
+    afterEach(function() {
+      Keycard.reset();
+      Keycard = undefined;
+    }); // end after
+    
+    it("should support complex associations", function() {
+      expect(jamie.get_room().get_name()).toEqual('Pearl Jam concert');
+      expect(jamie.get_room().get_users()[0].get_name()).toEqual('Jamie Dyer');
+      expect(jamie.get_room().get_keycards()[0].get_code()).toEqual('1234');
+      expect(jamie.get_room().get_keycards().length).toEqual(3);
+      expect(diy_room.get_keycards().length).toEqual(2);
+      expect(diy_room.get_keycards()[0].get_user().get_name()).toEqual('Frank Spencer');
+      expect(pjc_key2.get_user().get_name()).toEqual('Eddie Vedder');
+      expect(pjc_key2.get_user().get_room().get_name()).toEqual('Pearl Jam concert');
+    }); // end it
+    
   }); // end describe
   
 }); // end describe
