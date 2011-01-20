@@ -1,12 +1,13 @@
 var Model = function(name, options) {
   
-  options               = options                   || {};
-  var class_methods     = options.class_methods     || {};
-  var instance_methods  = options.instance_methods  || {};
-  var required_attrs    = options.required_attrs    || [];
-  var default_attrs     = options.default_attrs     || [];
-  var belongs_to        = options.belongs_to        || [];
-  var has_many          = options.has_many          || [];
+  options                     = options                         || {};
+  var class_methods           = options.class_methods           || {};
+  var instance_methods        = options.instance_methods        || {};
+  var required_attrs          = options.required_attrs          || [];
+  var default_attrs           = options.default_attrs           || [];
+  var belongs_to              = options.belongs_to              || [];
+  var has_many                = options.has_many                || [];
+  var has_and_belongs_to_many = options.has_and_belongs_to_many || [];
   
   var model = function(attributes, options){
     options           = options           || {};
@@ -47,6 +48,11 @@ var Model = function(name, options) {
       self.add_has_many(v);
     });
     
+    // create has_and_belongs_to_many associations
+    $.each(this.constructor.has_and_belongs_to_many, function(i,v){
+      self.add_has_and_belongs_to_many(v);
+    });
+    
     // apply any custom getters and setters
     if(this.constructor.define_getters_setters){
       this.constructor.define_getters_setters(this);
@@ -74,12 +80,13 @@ var Model = function(name, options) {
                 Model.Events,
                 Model.ClassMethods,
                 class_methods,
-                { required_attrs: required_attrs,
-                  default_attrs:  default_attrs,
-                  belongs_to:     belongs_to,
-                  has_many:       has_many,
-                  events:         {},
-                  _model_items:   []
+                { required_attrs:           required_attrs,
+                  default_attrs:            default_attrs,
+                  belongs_to:               belongs_to,
+                  has_many:                 has_many,
+                  has_and_belongs_to_many:  has_and_belongs_to_many,
+                  events:                   {},
+                  _model_items:             []
                 }
   );
   
