@@ -26,17 +26,30 @@ Model.ClassMethods = {
 
   // find method filters by the passed in options object
   find: function(options) {
+    var self = this;
     return $.grep(this._model_items, function(item, i){
       var options_has_properties = false;
       for(var k in options){
         options_has_properties = true;
-        if(item.attrs[k] != options[k]){
-          return false;
+        if(self.is_function(options[k])){
+          if(typeof item.attrs[k] != 'undefined'){
+            return options[k](item.attrs[k]);
+          }else{
+            return false;
+          }
+        }else{
+          if(item.attrs[k] != options[k]){
+            return false;
+          }
         }
       }
       return options_has_properties ? true : false;
     });
   },
+  
+  is_function: function(o) {
+	  return typeof o == 'function' || Object.prototype.toString.call(o) == '[object Function]' ? true : false;
+	},
   
   first: function(){
     return this._model_items[0];

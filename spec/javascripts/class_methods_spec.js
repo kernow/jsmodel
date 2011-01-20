@@ -58,6 +58,32 @@ describe("class methods", function() {
       var users = User.find({ age: 16 });
       expect(users.length).toEqual(0);
     });
+    
+    describe("advanced find", function() {
+      
+      var user4, user5, user6;
+      
+      beforeEach(function() {
+        user4 = new User({ name: 'Jamie', nicknames: ['J', 'Jam', 'Jay'] });
+        user5 = new User({ name: 'John',  nicknames: ['J', 'Johno'] });
+        user6 = new User({ name: 'Jay',   nicknames: ['J', 'Jay'] });
+      }); // end before
+      
+      it("should allow custom functions to be passed as matchers", function() {
+        var users1 = User.find({ nicknames: function(r){ return $.inArray('Jay',r) > -1; }});
+        expect(users1.length).toEqual(2);
+        
+        var users2 = User.find({ nicknames: function(r){ return $.inArray('J',r) > -1; }});
+        expect(users2.length).toEqual(3);
+        
+        var users3 = User.find({ nicknames: function(r){ return $.inArray('Johno',r) > -1; }});
+        expect(users3.length).toEqual(1);
+        
+        var users4 = User.find({ nicknames: function(r){ return $.inArray('Bazza',r) > -1; }});
+        expect(users4.length).toEqual(0);
+      }); // end it
+      
+    }); // end describe
   }); // end describe
   
   describe("first", function() {
