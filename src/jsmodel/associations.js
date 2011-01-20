@@ -19,27 +19,27 @@ Model.Associations = {
     var self = this;
     this['get_'+k] = function(){
       var obj = {};
-      obj[self.constructor.model_name+'_id'] = this.id();
+      obj[this.model_name()+'_id'] = this.id();
       return Model.find_by_name(k.singularize()).find(obj);
     };
     this['set_'+k] = function(models){
       // remove all associations
       var obj = {};
-      obj[self.constructor.model_name+'_id'] = this.id();
+      obj[this.model_name()+'_id'] = this.id();
       $.each(Model.find_by_name(k.singularize()).find(obj), function(i,model){
-        model['set_'+self.constructor.model_name+'_id'](undefined);
+        model['set_'+self.model_name()+'_id'](undefined);
       });
       // then add the new ones
       this['add_'+k](models);
     };
     this['add_'+k] = function(models){
       $.each(models, function(i,model){
-        model['set_'+self.constructor.model_name+'_id'](self.id());
+        model['set_'+self.model_name()+'_id'](self.id());
       });
     };
     this['remove_'+k] = function(models){
       $.each(models, function(i,model){
-        model['set_'+self.constructor.model_name+'_id'](undefined);
+        model['set_'+self.model_name()+'_id'](undefined);
       });
     };
   },
@@ -55,30 +55,28 @@ Model.Associations = {
     this['get_'+k+'_ids'] = function(){
       return this.attrs[k+'_ids'];
     };
-    //
     this['set_'+k] = function(models){
       this.attrs[k+'_ids'] = $.map(models, function(model,i){ return model.id(); });
       // remove all associations
       var obj = {};
-      obj[self.constructor.model_name.pluralize()+'_ids'] = function(r){ return $.inArray(self.id(), r) > -1; };
+      obj[this.model_name().pluralize()+'_ids'] = function(r){ return $.inArray(self.id(), r) > -1; };
       $.each(Model.find_by_name(k.singularize()).find(obj), function(i,model){
-        model['remove_'+self.constructor.model_name.pluralize()+'_ids']([self.id()]);
+        model['remove_'+self.model_name().pluralize()+'_ids']([self.id()]);
       });
       // add new ones
       $.each(models, function(i,model){
-        model['add_'+self.constructor.model_name.pluralize()+'_id'](self.id());
+        model['add_'+self.model_name().pluralize()+'_id'](self.id());
       });
     };
     this['set_'+k+'_ids'] = function(ids){
       this.attrs[k+'_ids'] = ids;
     };
-    //
     this['add_'+k] = function(models){
       $.each(models, function(i,model){
         if($.inArray(model.id(), self.attrs[k+'_ids']) < 0){
           self.attrs[k+'_ids'].push(model.id());
         }
-        model['add_'+self.constructor.model_name.pluralize()+'_id'](self.id());
+        model['add_'+self.model_name().pluralize()+'_id'](self.id());
       });
     };
     this['add_'+k+'_id'] = function(id){
@@ -94,7 +92,7 @@ Model.Associations = {
           self.attrs[k+'_ids'].splice(pos,1);
         }
         // remove from associated model
-        model['remove_'+self.constructor.model_name.pluralize()+'_ids']([self.id()]);
+        model['remove_'+self.model_name().pluralize()+'_ids']([self.id()]);
       });
     };
     this['remove_'+k+'_ids'] = function(ids){
@@ -105,6 +103,10 @@ Model.Associations = {
         }
       });
     };
+  },
+  
+  model_name: function(){
+    return this.constructor.model_name;
   }
   
 };
