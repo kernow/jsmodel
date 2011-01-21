@@ -39,18 +39,19 @@ var Model = function(name, options) {
     }
     
     // create belongs_to associations
-    $.each(this.constructor.belongs_to, function(i,v){
-      self.add_belongs_to(v);
+    $.each(this.constructor.belongs_to, function(k,v){
+      console.log(k);
+      self.add_belongs_to(k);
     });
     
     // create has_many associations
-    $.each(this.constructor.has_many, function(i,v){
-      self.add_has_many(v);
+    $.each(this.constructor.has_many, function(k,v){
+      self.add_has_many(k);
     });
     
     // create has_and_belongs_to_many associations
-    $.each(this.constructor.has_and_belongs_to_many, function(i,v){
-      self.add_has_and_belongs_to_many(v);
+    $.each(this.constructor.has_and_belongs_to_many, function(k,v){
+      self.add_has_and_belongs_to_many(k);
     });
     
     // apply any custom getters and setters
