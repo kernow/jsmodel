@@ -82,6 +82,7 @@ var Model = function(name, options) {
   jQuery.extend(model,
                 Model.Events,
                 Model.ClassMethods,
+                Model.Reflections,
                 class_methods,
                 { required_attrs:           required_attrs,
                   default_attrs:            default_attrs,
@@ -89,7 +90,8 @@ var Model = function(name, options) {
                   has_many:                 has_many,
                   has_and_belongs_to_many:  has_and_belongs_to_many,
                   events:                   {},
-                  _model_items:             []
+                  _model_items:             [],
+                  _reflections:             []
                 }
   );
   
@@ -99,6 +101,9 @@ var Model = function(name, options) {
                 Model.Associations,
                 instance_methods
   );
+  
+  // add reflections
+  model.add_reflections_for_self();
   
   Model._add(model, name);
   

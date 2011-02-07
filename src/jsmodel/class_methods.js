@@ -73,7 +73,8 @@ Model.ClassMethods = {
   },
 
   reset: function() {
-    this._model_items = [];
+    this._model_items  = [];
+    this._refelections = [];
     this.write_to_store();
   },
   

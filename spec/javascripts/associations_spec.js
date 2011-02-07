@@ -346,4 +346,82 @@ describe("associations", function() {
     
   }); // end describe
   
+  describe("destroying records with associations", function() {
+    
+    describe("belongs_to", function() {
+      
+      beforeEach(function() {
+        User = Model('user', {
+          belongs_to: { room: {}}
+        });
+        Room = Model('room', {
+          has_many: { users: {}}
+        });
+
+        jamie = new User({ name: 'Jamie Dyer' });
+        frank = new User({ name: 'Frank Spencer' });
+        eddie = new User({ name: 'Eddie Vedder' });
+
+        pjc_room = new Room({ name: 'Pearl Jam concert', users: [jamie, eddie] });
+        diy_room = new Room({ name: 'DIY Enthusiasts',   users: [frank] });
+      });
+
+      it("should remove the associated id", function() {
+        expect(pjc_room.get_users().length).toEqual(2);
+        expect(diy_room.get_users().length).toEqual(1);
+        diy_room.remove();
+        expect(frank.get_room()).toBeUndefined();
+        expect(frank.attrs.room_id).toEqual(undefined);
+      }); // end it
+      
+    }); // end describe
+    
+    describe("has_and_belongs_to_many", function() {
+      
+      beforeEach(function() {
+        User = Model('user', {
+          has_and_belongs_to_many: { rooms: {}}
+        });
+        Room = Model('room', {
+          has_and_belongs_to_many: { users: {}}
+        });
+
+        jamie = new User({ name: 'Jamie Dyer' });
+        frank = new User({ name: 'Frank Spencer' });
+        eddie = new User({ name: 'Eddie Vedder' });
+
+        pjc_room = new Room({ name: 'Pearl Jam concert', users: [jamie, eddie] });
+        diy_room = new Room({ name: 'DIY Enthusiasts',   users: [frank, jamie] });
+      });
+
+      it("should remove the associated id", function() {
+        expect(pjc_room.get_users().length).toEqual(2);
+        expect(diy_room.get_users().length).toEqual(2);
+        expect(frank.get_rooms().length).toEqual(1);
+        expect(jamie.get_rooms().length).toEqual(2);
+        expect(eddie.get_rooms().length).toEqual(1);
+        
+        diy_room.remove();
+        
+        expect(pjc_room.attrs.users_ids.length).toEqual(2);
+        expect(frank.attrs.rooms_ids.length).toEqual(0);
+        expect(jamie.attrs.rooms_ids.length).toEqual(1);
+        expect(eddie.attrs.rooms_ids.length).toEqual(1);
+        
+        jamie.remove();
+        
+        expect(pjc_room.attrs.users_ids.length).toEqual(1);
+        expect(eddie.attrs.rooms_ids.length).toEqual(1);
+        expect(frank.attrs.rooms_ids.length).toEqual(0);
+        
+        pjc_room.remove();
+        
+        expect(eddie.attrs.rooms_ids.length).toEqual(0);
+        expect(frank.attrs.rooms_ids.length).toEqual(0);
+      }); // end it
+      
+    }); // end describe
+    
+  }); // end describe
+  
 }); // end describe

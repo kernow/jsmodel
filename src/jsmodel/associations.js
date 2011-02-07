@@ -2,7 +2,7 @@ Model.Associations = {
   
   add_belongs_to: function(k) {
     this['get_'+k] = function(){
-      return Model.find_by_name(k).find({ id: this.attrs[k+'_id'] })[0];
+      return Model.find_by_name(k).find({ id: this.attrs[k+'_id'] })[0] || undefined;
     };
     this['get_'+k+'_id'] = function(){
       return this.attrs['get_'+k+'_id'];
@@ -103,6 +103,27 @@ Model.Associations = {
         }
       });
     };
+  },
+  
+  remove_associtions: function(record){
+    var self = this;
+    $.each(Model.find_by_name(this.model_name()).reflections(), function(i,r){
+      $.each(r, function(k,v){
+        switch(k){
+          case "has_many":
+            $.each(record['get_'+v](), function(i,r){
+              r['set_'+self.model_name()+'_id'](undefined);
+            });
+            break;
+            
+          case "has_and_belongs_to_many":
+            $.each(record['get_'+v](), function(i,r){
+              r['remove_'+self.model_name().pluralize()+'_ids']([record.id()]);
+            });
+            break;
+        }
+      });
+    });
   },
   
   model_name: function(){
