@@ -1,22 +1,22 @@
 describe("instance methods", function() {
   
+  var User, user;
+  
+  afterEach(function() {
+    User.reset();
+    user = undefined;
+    user = undefined;
+  }); // end after
+  
   describe("valid", function() {
     
     describe("callbacks", function() {
-      
-      var User, user;
       
       beforeEach(function() {
         User = Model('user');
         user = new User();
         new Mock(User);
       }); // end before
-      
-      afterEach(function() {
-        User.reset();
-        user = undefined;
-        user = undefined;
-      }); // end after
       
       it("should not be triggered when the skip_callbacks options is passed", function() {
         User.expects('trigger').never();
@@ -33,6 +33,24 @@ describe("instance methods", function() {
   }); // end describe
   
   describe("remove", function() {
+    
+    beforeEach(function() {
+      User = Model('user');
+      user  = new User({ name: 'user1'});
+      user2 = new User({ name: 'user2'});
+    }); // end before
+    
+    it("should remove the record", function() {
+      expect(User.all().length).toEqual(2);
+      user.remove();
+      expect(User.all().length).toEqual(1);
+    }); // end it
+    
+    it("should return the deleted record", function() {
+      expect(User.first()).toEqual(user);
+      expect(user.remove()).toEqual(user);
+      expect(User.first()).toNotEqual(user);
+    }); // end it
     
   }); // end describe
   
