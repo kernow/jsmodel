@@ -5,9 +5,9 @@ var Model = function(name, options) {
   var instance_methods        = options.instance_methods        || {};
   var required_attrs          = options.required_attrs          || [];
   var default_attrs           = options.default_attrs           || [];
-  var belongs_to              = options.belongs_to              || [];
-  var has_many                = options.has_many                || [];
-  var has_and_belongs_to_many = options.has_and_belongs_to_many || [];
+  var belongs_to              = options.belongs_to              || {};
+  var has_many                = options.has_many                || {};
+  var has_and_belongs_to_many = options.has_and_belongs_to_many || {};
   
   var model = function(attributes, options){
     options           = options           || {};
@@ -40,7 +40,6 @@ var Model = function(name, options) {
     
     // create belongs_to associations
     $.each(this.constructor.belongs_to, function(k,v){
-      console.log(k);
       self.add_belongs_to(k);
     });
     
