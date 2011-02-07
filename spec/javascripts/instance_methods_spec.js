@@ -4,7 +4,7 @@ describe("instance methods", function() {
   
   afterEach(function() {
     User.reset();
-    user = undefined;
+    User = undefined;
     user = undefined;
   }); // end after
   
@@ -34,11 +34,17 @@ describe("instance methods", function() {
   
   describe("remove", function() {
     
+    var user2
+    
     beforeEach(function() {
       User = Model('user');
       user  = new User({ name: 'user1'});
       user2 = new User({ name: 'user2'});
     }); // end before
+    
+    afterEach(function() {
+      user2 = undefined;
+    }); // end after
     
     it("should remove the record", function() {
       expect(User.all().length).toEqual(2);
@@ -55,6 +61,37 @@ describe("instance methods", function() {
   }); // end describe
   
   describe("update", function() {
+    
+    var user2
+    
+    beforeEach(function() {
+      User = Model('user');
+      user  = new User({ name: 'user1', age: 99, sex: 'male' });
+      user2 = new User({ name: 'user2', age: 20, sex: 'female' });
+    }); // end before
+    
+    afterEach(function() {
+      user2 = undefined;
+    }); // end after
+    
+    it("should update the attributes", function() {
+      expect(user.get_name()).toEqual('user1');
+      expect(user.get_age()).toEqual(99);
+      expect(user.get_sex()).toEqual('male');
+      user.update({ name: 'Roger' });
+      expect(user.get_name()).toEqual('Roger');
+      user.update({ sex: 'unknown', age: 28 });
+      expect(user.get_age()).toEqual(28);
+      expect(user.get_sex()).toEqual('unknown');
+      
+      expect(user2.get_name()).toEqual('user2');
+      expect(user2.get_age()).toEqual(20);
+      expect(user2.get_sex()).toEqual('female');
+      user2.update({ name: 'Sam', age: 45, sex: 'changed' });
+      expect(user2.get_name()).toEqual('Sam');
+      expect(user2.get_age()).toEqual(45);
+      expect(user2.get_sex()).toEqual('changed');
+    }); // end it
     
   }); // end describe
   
