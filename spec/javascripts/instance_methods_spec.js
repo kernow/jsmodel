@@ -101,6 +101,23 @@ describe("instance methods", function() {
   
   describe("flatten", function() {
     
+    var user2
+    
+    beforeEach(function() {
+      User = Model('user');
+      user  = new User({ name: 'user1', age: 99, sex: 'male' });
+      user2 = new User({ name: 'user2', age: 20, sex: 'female' });
+    }); // end before
+    
+    afterEach(function() {
+      user2 = undefined;
+    }); // end after
+    
+    it("should return a flattened representation of the model", function() {
+      expect(user.flatten() ).toEqual({ id: 0, name: 'user1', age: 99, sex: 'male' });
+      expect(user2.flatten()).toEqual({ id: 1, name: 'user2', age: 20, sex: 'female' });
+    }); // end it
+    
   }); // end describe
   
 }); // end describe
