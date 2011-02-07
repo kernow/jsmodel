@@ -70,7 +70,10 @@ var Model = function(name, options) {
     }
     
     if(!options.skip_save){
-      this.save();
+      this.constructor.trigger('before_create', [this]);
+      if(this.save()){
+        this.constructor.trigger('after_create', [this]);
+      }
     }
   };
   
