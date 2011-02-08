@@ -37,7 +37,7 @@ Model.InstanceMethods = {
     });
     this.constructor.write_to_store();
     // remove this record from any associated records
-    this.remove_associtions(deleted_item[0]);
+    this.remove_associtions();
     this.constructor.trigger('after_remove', [deleted_item[0]]);
     return deleted_item[0];
   },

@@ -105,20 +105,20 @@ Model.Associations = {
     };
   },
   
-  remove_associtions: function(record){
+  remove_associtions: function(){
     var self = this;
     $.each(Model.find_by_name(this.model_name()).reflections(), function(i,r){
       $.each(r, function(k,v){
         switch(k){
           case "has_many":
-            $.each(record['get_'+v](), function(i,r){
+            $.each(self['get_'+v](), function(i,r){
               r['set_'+self.model_name()+'_id'](undefined);
             });
             break;
             
           case "has_and_belongs_to_many":
-            $.each(record['get_'+v](), function(i,r){
-              r['remove_'+self.model_name().pluralize()+'_ids']([record.id()]);
+            $.each(self['get_'+v](), function(i,r){
+              r['remove_'+self.model_name().pluralize()+'_ids']([self.id()]);
             });
             break;
         }
