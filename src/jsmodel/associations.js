@@ -107,7 +107,7 @@ Model.Associations = {
   
   remove_associtions: function(){
     var self = this;
-    $.each(Model.find_by_name(this.model_name()).reflections(), function(i,r){
+    $.each(this.reflections(), function(i,r){
       $.each(r, function(k,v){
         switch(k){
           case "has_many":
@@ -124,6 +124,10 @@ Model.Associations = {
         }
       });
     });
+  },
+  
+  reflections: function(){
+    return Model.find_by_name(this.model_name()).reflections();
   },
   
   model_name: function(){
