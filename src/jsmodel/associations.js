@@ -122,6 +122,38 @@ Model.Associations = {
     };
   },
   
+  save_associated_records: function(){
+    console.log('saving associations');
+    var self = this;
+    this.with_each_reflection(function(type, key){
+      switch(type){
+        case "has_many":
+        case "has_and_belongs_to_many":
+          // save associated records
+          $.each(self['get_'+key](), function(i,r){
+            if(r.dirty()){
+              r.save();
+            }
+          });
+          break;
+      }
+    })
+  },
+  
+  // is the in memory object different than the saved object?
+  dirty: function(){
+    return 
+  }
+  
+  with_each_reflection: function(block){
+    var self = this;
+    $.each(this.reflections(), function(i,r){
+      $.each(r, function(k,v){
+        block(k,v);
+      });
+    });
+  },
+  
   remove_associtions: function(){
     var self = this;
     $.each(this.reflections(), function(i,r){

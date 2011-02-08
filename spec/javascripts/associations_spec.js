@@ -424,4 +424,48 @@ describe("associations", function() {
     
   }); // end describe
   
+  describe("saving records with associations", function() {
+    
+    describe("has_many", function() {
+      
+      beforeEach(function() {
+        User = Model('user', {
+          belongs_to: { room: {}}
+        });
+        Room = Model('room', {
+          has_many: { users: {}}
+        });
+
+        jamie = new User({ name: 'Jamie Dyer' });
+        frank = new User({ name: 'Frank Spencer' });
+        eddie = new User({ name: 'Eddie Vedder' });
+
+        pjc_room = new Room({ name: 'Pearl Jam concert' });
+        diy_room = new Room({ name: 'DIY Enthusiasts' });
+        
+        var m = new Mock(frank);
+        var m = new Mock(jamie);
+        var m = new Mock(eddie);
+      });
+
+      it("should save the associated record", function() {
+        diy_room.set_users([frank]);
+        frank.expects('save');
+        jamie.expects('save').never();
+        eddie.expects('save').never();
+        diy_room.save();
+      }); // end it
+      
+      it("should save teh associated records", function() {
+        pjc_room.set_users([jamie, eddie]);
+        frank.expects('save').never();
+        jamie.expects('save');
+        eddie.expects('save');
+        pjc_room.save();
+      }); // end it
+      
+    }); // end describe
+    
+  }); // end describe
+  
 }); // end describe
