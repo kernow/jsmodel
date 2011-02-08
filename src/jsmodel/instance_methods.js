@@ -79,6 +79,7 @@ Model.InstanceMethods = {
         this.constructor.write_to_store();
       }
       this.clear_dirty();
+      this.save_associated_records();
       this.constructor.trigger('after_save', [this]);
       return true;
     }else{
