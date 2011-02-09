@@ -9,8 +9,13 @@ Model.InstanceMethods = {
   },
   
   add_getter_setter: function(k) {
-    this["get_"+k] = function()   { return this.attrs[k]; };
-    this["set_"+k] = function(v)  { this.attrs[k] = v; };
+    this["get_"+k] = function(){ return this.attrs[k]; };
+    this["set_"+k] = function(v){
+      if(this.attrs[k] != v){
+        this.will_change(k);
+      }
+      this.attrs[k] = v;
+    };
   },
 
   valid: function(options) {
@@ -73,6 +78,7 @@ Model.InstanceMethods = {
       }else{ // updating an existing record
         this.constructor.write_to_store();
       }
+      this.clear_dirty();
       this.constructor.trigger('after_save', [this]);
       return true;
     }else{

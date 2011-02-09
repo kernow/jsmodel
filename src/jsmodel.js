@@ -16,6 +16,7 @@ var Model = function(name, options) {
     this.attrs  = {}; // model attributes object
     this.errors = []; // validation errors array
     this.state  = 'new';
+    this.changed_attributes = {}; // keep track of change attributes
     
     var self = this;
     
@@ -99,6 +100,7 @@ var Model = function(name, options) {
   jQuery.extend(model.prototype,
                 Model.InstanceMethods,
                 Model.Associations,
+                Model.Dirty,
                 instance_methods
   );
   
