@@ -78,8 +78,8 @@ Model.InstanceMethods = {
       }else{ // updating an existing record
         this.constructor.write_to_store();
       }
-      this.clear_dirty();
-      this.save_associated_records();
+      var dirty_attributes = this.clear_dirty();
+      this.save_associated_records(dirty_attributes);
       this.constructor.trigger('after_save', [this]);
       return true;
     }else{

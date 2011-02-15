@@ -11,12 +11,14 @@ Model.Associations = {
       if(this.attrs[k+'_id'] != model.id()){
         this.will_change(k+'_id');
       }
+      // set listener on associated model ?
       this.attrs[k+'_id'] = model.id();
     };
     this['set_'+k+'_id'] = function(v){
       if(this.attrs[k+'_id'] != v){
         this.will_change(k+'_id');
       }
+      // set listener on associated model ?
       this.attrs[k+'_id'] = v;
     };
   },
@@ -122,8 +124,7 @@ Model.Associations = {
     };
   },
   
-  save_associated_records: function(){
-    console.log('saving associations');
+  save_associated_records: function(dirty_attributes){
     var self = this;
     this.with_each_reflection(function(type, key){
       switch(type){
@@ -131,19 +132,27 @@ Model.Associations = {
         case "has_and_belongs_to_many":
           // save associated records
           $.each(self['get_'+key](), function(i,r){
-            if(r.dirty()){
+            if(r.changed()){
               r.save();
+            }
+          });
+          // save dirty associations
+          $.each(dirty_attributes, function(k,v){
+            if(key+'_ids' == k){
+              // get the model
+              $.each(v.old, function(i,id){
+                $.each(Model.find_by_name(key.singularize()).find({ id: id }), function(i,r){
+                  if(r.changed()){
+                    r.save();
+                  }
+                });
+              });
             }
           });
           break;
       }
-    })
+    });
   },
-  
-  // is the in memory object different than the saved object?
-  dirty: function(){
-    return 
-  }
   
   with_each_reflection: function(block){
     var self = this;

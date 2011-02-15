@@ -371,7 +371,7 @@ describe("associations", function() {
         expect(diy_room.get_users().length).toEqual(1);
         diy_room.remove();
         expect(frank.get_room()).toBeUndefined();
-        expect(frank.attrs.room_id).toEqual(undefined);
+        expect(frank.attrs.room_id).toBeUndefined();
       }); // end it
       
     }); // end describe
@@ -450,17 +450,85 @@ describe("associations", function() {
 
       it("should save the associated record", function() {
         diy_room.set_users([frank]);
-        frank.expects('save');
-        jamie.expects('save').never();
-        eddie.expects('save').never();
+        frank.spies('save');
+        jamie.spies('save').never();
+        eddie.spies('save').never();
         diy_room.save();
       }); // end it
       
-      it("should save teh associated records", function() {
+      it("should save the associated records", function() {
         pjc_room.set_users([jamie, eddie]);
-        frank.expects('save').never();
-        jamie.expects('save');
-        eddie.expects('save');
+        frank.spies('save').never();
+        jamie.spies('save');
+        eddie.spies('save');
+        pjc_room.save();
+      }); // end it
+      
+    }); // end describe
+    
+    describe("has_and_belongs_to_many", function() {
+      
+      beforeEach(function() {
+        User = Model('user', {
+          has_and_belongs_to_many: { rooms: {}}
+        });
+        Room = Model('room', {
+          has_and_belongs_to_many: { users: {}}
+        });
+
+        jamie = new User({ name: 'Jamie Dyer' });
+        frank = new User({ name: 'Frank Spencer' });
+        eddie = new User({ name: 'Eddie Vedder' });
+
+        pjc_room = new Room({ name: 'Pearl Jam concert' });
+        diy_room = new Room({ name: 'DIY Enthusiasts' });
+        
+        var m = new Mock(frank);
+        var m = new Mock(jamie);
+        var m = new Mock(eddie);
+        
+        var m = new Mock(pjc_room);
+        var m = new Mock(diy_room);
+      });
+
+      it("should save the associated record", function() {
+        diy_room.set_users([frank]);
+        frank.spies('save');
+        jamie.spies('save').never();
+        eddie.spies('save').never();
+        diy_room.save();
+      }); // end it
+      
+      it("should save the associated records", function() {
+        pjc_room.set_users([jamie, eddie]);
+        frank.spies('save').never();
+        jamie.spies('save');
+        eddie.spies('save');
+        pjc_room.save();
+      }); // end it
+      
+      it("figure it out", function() {
+        pjc_room.set_users([jamie, eddie]);
+        pjc_room.save();
+        
+        jamie.spies('save');
+        eddie.spies('save').never();
+        frank.spies('save').never();
+        
+        pjc_room.remove_users([jamie]);
+        pjc_room.save();
+      }); // end it
+      
+      xit("should not save associated records when the association ids haven't changed", function() {
+        pjc_room.set_users([jamie, eddie]);
+        pjc_room.save();
+        
+        frank.spies('save').never();
+        jamie.spies('save');
+        eddie.spies('save').never();
+        
+        eddie.set_name('Eddie Vedder the Second');
+        pjc_room.remove_users([jamie]);
         pjc_room.save();
       }); // end it
       
