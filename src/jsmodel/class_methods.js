@@ -88,6 +88,7 @@ Model.ClassMethods = {
       $.each(items, function(i, item) {
         var model = new self(item, { skip_save: true });
         self._model_items.push(model);
+        model.state = 'saved';
         self.trigger('after_load', [model]);
       });
     } else {
