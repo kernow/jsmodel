@@ -1033,13 +1033,14 @@ Model.ClassMethods = {
   load: function() {
     this._model_items = [];
 
-    var that = this;
+    var self = this;
     if (Model.Storage.contains(this.model_name)) {
       var items = Model.Storage.getObject(this.model_name);
       $.each(items, function(i, item) {
-        var model = new that(item, { skip_save: true });
-        that._model_items.push(model);
-        that.trigger('after_load', [model]);
+        var model = new self(item, { skip_save: true });
+        self._model_items.push(model);
+        model.state = 'saved';
+        self.trigger('after_load', [model]);
       });
     } else {
       this.reset();
@@ -1167,11 +1168,11 @@ Model.InstanceMethods = {
 
   remove: function() {
     this.constructor.trigger('before_remove', [this]);
-    var that = this;
+    var self = this;
     var deleted_item;
     $.each(this.constructor._model_items, function(i, item){
-      if(item.id() == that.id()){
-        deleted_item = that.constructor._model_items.splice(i, 1);
+      if(item.id() == self.id()){
+        deleted_item = self.constructor._model_items.splice(i, 1);
         return false;
       }
     });
