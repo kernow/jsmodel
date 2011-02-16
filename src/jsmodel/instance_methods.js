@@ -32,11 +32,11 @@ Model.InstanceMethods = {
 
   remove: function() {
     this.constructor.trigger('before_remove', [this]);
-    var that = this;
+    var self = this;
     var deleted_item;
     $.each(this.constructor._model_items, function(i, item){
-      if(item.id() == that.id()){
-        deleted_item = that.constructor._model_items.splice(i, 1);
+      if(item.id() == self.id()){
+        deleted_item = self.constructor._model_items.splice(i, 1);
         return false;
       }
     });
