@@ -82,13 +82,13 @@ Model.ClassMethods = {
     // clear memory before loading from local storage
     this._model_items = [];
     
-    var that = this;
+    var self = this;
     if (Model.Storage.contains(this.model_name)) {
       var items = Model.Storage.getObject(this.model_name);
       $.each(items, function(i, item) {
-        var model = new that(item, { skip_save: true });
-        that._model_items.push(model);
-        that.trigger('after_load', [model]);
+        var model = new self(item, { skip_save: true });
+        self._model_items.push(model);
+        self.trigger('after_load', [model]);
       });
     } else {
       this.reset();
