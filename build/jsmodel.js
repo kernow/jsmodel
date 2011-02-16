@@ -712,6 +712,7 @@ var Model = function(name, options) {
     this.attrs  = {}; // model attributes object
     this.errors = []; // validation errors array
     this.state  = 'new';
+    this.changed_attributes = {}; // keep track of change attributes
 
     var self = this;
 
@@ -786,8 +787,8 @@ var Model = function(name, options) {
   jQuery.extend(model.prototype,
                 Model.InstanceMethods,
                 Model.Associations,
-                instance_methods
-  );
+                Model.Dirty,
+                instance_methods);
 
   model.add_reflections_for_self();
 
@@ -819,9 +820,15 @@ Model.Associations = {
       return this.attrs['get_'+k+'_id'];
     };
     this['set_'+k] = function(model){
+      if(this.attrs[k+'_id'] != model.id()){
+        this.will_change(k+'_id');
+      }
       this.attrs[k+'_id'] = model.id();
     };
     this['set_'+k+'_id'] = function(v){
+      if(this.attrs[k+'_id'] != v){
+        this.will_change(k+'_id');
+      }
       this.attrs[k+'_id'] = v;
     };
   },
@@ -864,7 +871,11 @@ Model.Associations = {
       return this.attrs[k+'_ids'];
     };
     this['set_'+k] = function(models){
-      this.attrs[k+'_ids'] = $.map(models, function(model,i){ return model.id(); });
+      var new_ids = $.map(models, function(model,i){ return model.id(); });
+      if(this.attrs[k+'_ids'] != new_ids){
+        this.will_change(k+'_ids');
+      }
+      this.attrs[k+'_ids'] = new_ids;
       var obj = {};
       obj[this.model_name().pluralize()+'_ids'] = function(r){ return $.inArray(self.id(), r) > -1; };
       $.each(Model.find_by_name(k.singularize()).find(obj), function(i,model){
@@ -875,11 +886,15 @@ Model.Associations = {
       });
     };
     this['set_'+k+'_ids'] = function(ids){
+      if(this.attrs[k+'_ids'] != ids){
+        this.will_change(k+'_ids');
+      }
       this.attrs[k+'_ids'] = ids;
     };
     this['add_'+k] = function(models){
       $.each(models, function(i,model){
         if($.inArray(model.id(), self.attrs[k+'_ids']) < 0){
+          self.will_change(k+'_ids');
           self.attrs[k+'_ids'].push(model.id());
         }
         model['add_'+self.model_name().pluralize()+'_id'](self.id());
@@ -887,6 +902,7 @@ Model.Associations = {
     };
     this['add_'+k+'_id'] = function(id){
       if($.inArray(id, self.attrs[k+'_ids']) < 0){
+        this.will_change(k+'_ids');
         this.attrs[k+'_ids'].push(id);
       }
     };
@@ -894,6 +910,7 @@ Model.Associations = {
       $.each(models, function(i,model){
         var pos = $.inArray(model.id(), self.attrs[k+'_ids']);
         if(pos > -1){
+          self.will_change(k+'_ids');
           self.attrs[k+'_ids'].splice(pos,1);
         }
         model['remove_'+self.model_name().pluralize()+'_ids']([self.id()]);
@@ -903,10 +920,47 @@ Model.Associations = {
       $.each(ids, function(i,id){
         var pos = $.inArray(id, self.attrs[k+'_ids']);
         if(pos > -1){
+          self.will_change(k+'_ids');
           self.attrs[k+'_ids'].splice(pos,1);
         }
       });
     };
+  },
+
+  save_associated_records: function(dirty_attributes){
+    var self = this;
+    this.with_each_reflection(function(type, key){
+      switch(type){
+        case "has_many":
+        case "has_and_belongs_to_many":
+          $.each(self['get_'+key](), function(i,r){
+            if(r.changed()){
+              r.save();
+            }
+          });
+          $.each(dirty_attributes, function(k,v){
+            if(key+'_ids' == k){
+              $.each(v.old, function(i,id){
+                $.each(Model.find_by_name(key.singularize()).find({ id: id }), function(i,r){
+                  if(r.changed()){
+                    r.save();
+                  }
+                });
+              });
+            }
+          });
+          break;
+      }
+    });
+  },
+
+  with_each_reflection: function(block){
+    var self = this;
+    $.each(this.reflections(), function(i,r){
+      $.each(r, function(k,v){
+        block(k,v);
+      });
+    });
   },
 
   remove_associtions: function(){
@@ -1047,6 +1101,42 @@ Model.ClassMethods = {
   }
 
 };
+Model.Dirty = {
+
+  will_change: function(key){
+    if($.isArray(this.attrs[key])){
+      var value = $.extend([], this.attrs[key]);
+    }else{
+      var value = this.attrs[key];
+    }
+    this.changed_attributes[key] = { old: value };
+  },
+
+  changed: function(){
+    return this.changed_attributes_count() > 0;
+  },
+
+  has_changed: function(key){
+    return this.changed_attributes[key] !== undefined;
+  },
+
+  changed_attributes_count: function(){
+    var count = 0, k;
+    for(k in this.changed_attributes) {
+      if (this.changed_attributes.hasOwnProperty(k)) {
+        ++count;
+      }
+    }
+    return count;
+  },
+
+  clear_dirty: function(){
+    var dirty_attributes = this.changed_attributes;
+    this.changed_attributes = {};
+    return dirty_attributes;
+  }
+
+};
 Model.Events = {
 
   bind: function(event, callback) {
@@ -1094,8 +1184,13 @@ Model.InstanceMethods = {
   },
 
   add_getter_setter: function(k) {
-    this["get_"+k] = function()   { return this.attrs[k]; };
-    this["set_"+k] = function(v)  { this.attrs[k] = v; };
+    this["get_"+k] = function(){ return this.attrs[k]; };
+    this["set_"+k] = function(v){
+      if(this.attrs[k] != v){
+        this.will_change(k);
+      }
+      this.attrs[k] = v;
+    };
   },
 
   valid: function(options) {
@@ -1157,6 +1252,8 @@ Model.InstanceMethods = {
       }else{ // updating an existing record
         this.constructor.write_to_store();
       }
+      var dirty_attributes = this.clear_dirty();
+      this.save_associated_records(dirty_attributes);
       this.constructor.trigger('after_save', [this]);
       return true;
     }else{
