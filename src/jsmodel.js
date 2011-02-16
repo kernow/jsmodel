@@ -101,8 +101,7 @@ var Model = function(name, options) {
                 Model.InstanceMethods,
                 Model.Associations,
                 Model.Dirty,
-                instance_methods
-  );
+                instance_methods);
   
   // add reflections
   model.add_reflections_for_self();

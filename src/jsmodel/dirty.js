@@ -15,7 +15,7 @@ Model.Dirty = {
   },
   
   has_changed: function(key){
-    return this.changed_attributes[key] != undefined;
+    return this.changed_attributes[key] !== undefined;
   },
   
   changed_attributes_count: function(){
