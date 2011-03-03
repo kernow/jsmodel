@@ -6,6 +6,7 @@ var Model = function(name, options) {
   var required_attrs          = options.required_attrs          || [];
   var default_attrs           = options.default_attrs           || [];
   var belongs_to              = options.belongs_to              || {};
+  var has_one                 = options.has_one                 || {};
   var has_many                = options.has_many                || {};
   var has_and_belongs_to_many = options.has_and_belongs_to_many || {};
   
@@ -42,6 +43,11 @@ var Model = function(name, options) {
     // create belongs_to associations
     $.each(this.constructor.belongs_to, function(k,v){
       self.add_belongs_to(k);
+    });
+    
+    // create has_one associations
+    $.each(this.constructor.has_one, function(k,v){
+      self.add_has_one(k);
     });
     
     // create has_many associations
@@ -88,6 +94,7 @@ var Model = function(name, options) {
                 { required_attrs:           required_attrs,
                   default_attrs:            default_attrs,
                   belongs_to:               belongs_to,
+                  has_one:                  has_one,
                   has_many:                 has_many,
                   has_and_belongs_to_many:  has_and_belongs_to_many,
                   events:                   {},

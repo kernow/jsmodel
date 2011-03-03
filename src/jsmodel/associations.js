@@ -23,6 +23,24 @@ Model.Associations = {
     };
   },
   
+  add_has_one: function(k) {
+    this['get_'+k] = function(){
+      var obj = {};
+      obj[this.model_name()+'_id'] = this.id();
+      return Model.find_by_name(k).find(obj)[0];
+    };
+    this['set_'+k] = function(model){
+      // find any existing assoication and remove it
+      var association = this['get_'+k]();
+      if(association){
+        association['set_'+this.model_name()+'_id'](undefined);
+      }
+      if(model !== undefined){
+        model['set_'+this.model_name()+'_id'](this.id());
+      }
+    };
+  },
+  
   add_has_many: function(k) {
     var self = this;
     this['get_'+k] = function(){

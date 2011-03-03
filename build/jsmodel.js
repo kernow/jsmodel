@@ -702,6 +702,7 @@ var Model = function(name, options) {
   var required_attrs          = options.required_attrs          || [];
   var default_attrs           = options.default_attrs           || [];
   var belongs_to              = options.belongs_to              || {};
+  var has_one                 = options.has_one                 || {};
   var has_many                = options.has_many                || {};
   var has_and_belongs_to_many = options.has_and_belongs_to_many || {};
 
@@ -736,6 +737,10 @@ var Model = function(name, options) {
 
     $.each(this.constructor.belongs_to, function(k,v){
       self.add_belongs_to(k);
+    });
+
+    $.each(this.constructor.has_one, function(k,v){
+      self.add_has_one(k);
     });
 
     $.each(this.constructor.has_many, function(k,v){
@@ -776,6 +781,7 @@ var Model = function(name, options) {
                 { required_attrs:           required_attrs,
                   default_attrs:            default_attrs,
                   belongs_to:               belongs_to,
+                  has_one:                  has_one,
                   has_many:                 has_many,
                   has_and_belongs_to_many:  has_and_belongs_to_many,
                   events:                   {},
@@ -830,6 +836,23 @@ Model.Associations = {
         this.will_change(k+'_id');
       }
       this.attrs[k+'_id'] = v;
+    };
+  },
+
+  add_has_one: function(k) {
+    this['get_'+k] = function(){
+      var obj = {};
+      obj[this.model_name()+'_id'] = this.id();
+      return Model.find_by_name(k).find(obj)[0];
+    };
+    this['set_'+k] = function(model){
+      var association = this['get_'+k]();
+      if(association){
+        association['set_'+this.model_name()+'_id'](undefined);
+      }
+      if(model !== undefined){
+        model['set_'+this.model_name()+'_id'](this.id());
+      }
     };
   },
 
