@@ -1,3 +1,5 @@
+/*global Model: false */
+
 Model.InstanceMethods = {
 
   id: function(){
@@ -31,9 +33,10 @@ Model.InstanceMethods = {
   },
 
   remove: function() {
+    var self, deleted_item;
+    
     this.constructor.trigger('before_remove', [this]);
-    var self = this;
-    var deleted_item;
+    self = this;
     $.each(this.constructor._model_items, function(i, item){
       if(item.id() == self.id()){
         deleted_item = self.constructor._model_items.splice(i, 1);
@@ -48,11 +51,13 @@ Model.InstanceMethods = {
   },
   
   update: function(attrs) {
+    var updated, key, current_value;
+    
     this.constructor.trigger('before_update', [this]);
-    var updated = false;
-    for(var key in attrs){
+    updated = false;
+    for(key in attrs){
       if (attrs.hasOwnProperty(key)) {
-        var current_value = this.attrs[key];
+        current_value = this.attrs[key];
         if(current_value != attrs[key]){
           this["set_"+key](attrs[key]);
           updated = true;
@@ -71,6 +76,8 @@ Model.InstanceMethods = {
   },
   
   save: function() {
+    var dirty_attributes;
+    
     if(this.valid()) {
       this.constructor.trigger('before_save', [this]);
       if(this.state == 'new'){ // new record
@@ -78,7 +85,7 @@ Model.InstanceMethods = {
       }else{ // updating an existing record
         this.constructor.write_to_store();
       }
-      var dirty_attributes = this.clear_dirty();
+      dirty_attributes = this.clear_dirty();
       this.save_associated_records(dirty_attributes);
       this.constructor.trigger('after_save', [this]);
       return true;
@@ -88,7 +95,9 @@ Model.InstanceMethods = {
   },
   
   flatten: function() {
-    var attrs = $.extend({}, this.attrs);
+    var attrs;
+    
+    attrs = $.extend({}, this.attrs);
     return attrs;
   }
   

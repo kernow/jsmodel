@@ -1,3 +1,5 @@
+/*global Model: false */
+
 Model.Associations = {
   
   add_belongs_to: function(k) {
@@ -25,13 +27,17 @@ Model.Associations = {
   
   add_has_one: function(k) {
     this['get_'+k] = function(){
-      var obj = {};
+      var obj;
+      
+      obj = {};
       obj[this.model_name()+'_id'] = this.id();
       return Model.find_by_name(k).find(obj)[0];
     };
     this['set_'+k] = function(model){
+      var association;
+      
       // find any existing assoication and remove it
-      var association = this['get_'+k]();
+      association = this['get_'+k]();
       if(association){
         association['set_'+this.model_name()+'_id'](undefined);
       }
@@ -42,15 +48,21 @@ Model.Associations = {
   },
   
   add_has_many: function(k) {
-    var self = this;
+    var self;
+    
+    self = this;
     this['get_'+k] = function(){
-      var obj = {};
+      var obj;
+      
+      obj = {};
       obj[this.model_name()+'_id'] = this.id();
       return Model.find_by_name(k.singularize()).find(obj);
     };
     this['set_'+k] = function(models){
+      var obj;
+      
       // remove all associations
-      var obj = {};
+      obj = {};
       obj[this.model_name()+'_id'] = this.id();
       $.each(Model.find_by_name(k.singularize()).find(obj), function(i,model){
         model['set_'+self.model_name()+'_id'](undefined);
@@ -71,7 +83,9 @@ Model.Associations = {
   },
   
   add_has_and_belongs_to_many: function(k){
-    var self = this;
+    var self;
+    
+    self = this;
     // setup the array to store the association ids
     this.attrs[k+'_ids'] = [];
     
@@ -82,13 +96,16 @@ Model.Associations = {
       return this.attrs[k+'_ids'];
     };
     this['set_'+k] = function(models){
-      var new_ids = $.map(models, function(model,i){ return model.id(); });
+      var new_ids, obj;
+      
+      new_ids = $.map(models, function(model,i){ return model.id(); });
       if(this.attrs[k+'_ids'] != new_ids){
         this.will_change(k+'_ids');
       }
       this.attrs[k+'_ids'] = new_ids;
+      
       // remove all associations
-      var obj = {};
+      obj = {};
       obj[this.model_name().pluralize()+'_ids'] = function(r){ return $.inArray(self.id(), r) > -1; };
       $.each(Model.find_by_name(k.singularize()).find(obj), function(i,model){
         model['remove_'+self.model_name().pluralize()+'_ids']([self.id()]);
@@ -121,8 +138,10 @@ Model.Associations = {
     };
     this['remove_'+k] = function(models){
       $.each(models, function(i,model){
+        var pos;
+        
         // remove ids from own array
-        var pos = $.inArray(model.id(), self.attrs[k+'_ids']);
+        pos = $.inArray(model.id(), self.attrs[k+'_ids']);
         if(pos > -1){
           self.will_change(k+'_ids');
           self.attrs[k+'_ids'].splice(pos,1);
@@ -133,7 +152,9 @@ Model.Associations = {
     };
     this['remove_'+k+'_ids'] = function(ids){
       $.each(ids, function(i,id){
-        var pos = $.inArray(id, self.attrs[k+'_ids']);
+        var pos;
+        
+        pos = $.inArray(id, self.attrs[k+'_ids']);
         if(pos > -1){
           self.will_change(k+'_ids');
           self.attrs[k+'_ids'].splice(pos,1);
@@ -143,7 +164,9 @@ Model.Associations = {
   },
   
   save_associated_records: function(dirty_attributes){
-    var self = this;
+    var self;
+    
+    self = this;
     this.with_each_reflection(function(type, key){
       switch(type){
         case "has_many":
@@ -173,7 +196,9 @@ Model.Associations = {
   },
   
   with_each_reflection: function(block){
-    var self = this;
+    var self;
+    
+    self = this;
     $.each(this.reflections(), function(i,r){
       $.each(r, function(k,v){
         block(k,v);
@@ -182,7 +207,9 @@ Model.Associations = {
   },
   
   remove_associtions: function(){
-    var self = this;
+    var self;
+    
+    self = this;
     $.each(this.reflections(), function(i,r){
       $.each(r, function(k,v){
         switch(k){

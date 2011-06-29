@@ -1,3 +1,5 @@
+/*global Model: false */
+
 Model.Events = {
 
   bind: function(event, callback) {
@@ -7,10 +9,12 @@ Model.Events = {
   },
 
   trigger: function(name, data) {
-    var events = this.events[name];
+    var events, i;
+    
+    events = this.events[name];
 
     if (events) {
-      for (var i = 0; i < events.length; i++) {
+      for (i = 0; i < events.length; i++) {
         events[i].apply(this, data || []);
       }
     }
@@ -19,10 +23,12 @@ Model.Events = {
   },
 
   unbind: function(event, callback) {
+    var events, i;
+    
     if (callback) {
-      var events = this.events[event] || [];
+      events = this.events[event] || [];
 
-      for (var i = 0; i < events.length; i++) {
+      for (i = 0; i < events.length; i++) {
         if (events[i] === callback) {
           this.events[event].splice(i, 1);
         }

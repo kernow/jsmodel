@@ -1,18 +1,22 @@
+/*global Model: false */
+
 Model.ClassMethods = {
 
   // _model_items: [],
 
   valid_required_attrs: function(model, attrs){
-    var required_attrs = {};
+    var required_attrs, key, obj;
+    
+    required_attrs = {};
     $.each(this.required_attrs, function(i,v){ required_attrs[v] = undefined; });
-    for(var key in required_attrs){
+    for(key in required_attrs){
       if (required_attrs.hasOwnProperty(key)) {
         if(typeof model.attrs[key] == 'undefined'){
-          var obj = {};
+          obj = {};
           obj[key] = 'is required';
           model.errors.push(obj);
         } else if(model.attrs[key] === ''){
-          var obj = {};
+          obj = {};
           obj[key] = 'cannot be blank';
           model.errors.push(obj);
         }
@@ -26,10 +30,14 @@ Model.ClassMethods = {
 
   // find method filters by the passed in options object
   find: function(options) {
-    var self = this;
+    var self;
+    
+    self = this;
     return $.grep(this._model_items, function(item, i){
-      var options_has_properties = false;
-      for(var k in options){
+      var options_has_properties, k;
+      
+      options_has_properties = false;
+      for(k in options){
         options_has_properties = true;
         if(self.is_function(options[k])){
           if(typeof item.attrs[k] != 'undefined'){
@@ -67,7 +75,9 @@ Model.ClassMethods = {
   },
   
   next_id: function(){
-    var id = -1;
+    var id;
+    
+    id = -1;
     $.each(this._model_items, function(i,o){ if(o.id() > id){ id = o.id(); }});
     return id+1;
   },
@@ -79,14 +89,18 @@ Model.ClassMethods = {
   },
   
   load: function() {
+    var self, items;
+    
     // clear memory before loading from local storage
     this._model_items = [];
     
-    var self = this;
+    self = this;
     if (Model.Storage.contains(this.model_name)) {
-      var items = Model.Storage.getObject(this.model_name);
+      items = Model.Storage.getObject(this.model_name);
       $.each(items, function(i, item) {
-        var model = new self(item, { skip_save: true });
+        var model;
+        
+        model = new self(item, { skip_save: true });
         self._model_items.push(model);
         model.state = 'saved';
         self.trigger('after_load', [model]);

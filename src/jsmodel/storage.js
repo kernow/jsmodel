@@ -1,3 +1,5 @@
+/*global Model: false */
+
 Model.Storage = {
   // TODO Add support for storage event
 
@@ -33,8 +35,9 @@ Model.Storage = {
   },
 
   getItem: function (key) {
+    var item;
     if (this.sessionStorage) {
-      var item = this.sessionStorage.getItem(key);
+      item = this.sessionStorage.getItem(key);
       if(item === null){
         return item;
       }else if(typeof item.value == 'undefined'){ // FF 3.0 impliments .value
@@ -43,7 +46,7 @@ Model.Storage = {
         return item.value;
       }
     } else {
-      return jQuery.cookie(key);
+      return $.cookie(key);
     }
   },
 
@@ -52,7 +55,7 @@ Model.Storage = {
       this.sessionStorage.removeItem(key); // Added in to try and fix support on the iPad
       this.sessionStorage.setItem(key, value);
     } else {
-      jQuery.cookie(key, value);
+      $.cookie(key, value);
       if (!this.contains(key)) {
         this.keys.push(key);        
       }
@@ -60,12 +63,13 @@ Model.Storage = {
   },
 
   removeItem: function (key) {
+    var k;
     if (this.sessionStorage) {
       this.sessionStorage.removeItem(key);
     } else {
-      for (var k = 0; k < this.length(); k++) {
+      for (k = 0; k < this.length(); k++) {
         if (this.keys[k] == key) {
-          jQuery.cookie(key, null);
+          $.cookie(key, null);
           if (k == this.length() - 1) {
             this.keys.pop();
           } else {
@@ -79,23 +83,24 @@ Model.Storage = {
   },
 
   clear: function () {
+    var len, keys, i, k, self;
     if (this.sessionStorage) {
       if(typeof this.sessionStorage.clear != "undefined"){
         this.sessionStorage.clear();
       }else{ // FF 3.0 doesn't support the clear method so we need to impliment it
-        var len = this.sessionStorage.length;
-        var keys = [];
+        len = this.sessionStorage.length;
+        keys = [];
         for(i=0;i<len;i++){
           keys.push(this.sessionStorage.key(i));
         }
-        var self = this;
+        self = this;
         $.each(keys, function(i, key){
           self.sessionStorage.removeItem(key);
         });
       }
     } else {
       for (k = 0; k < this.length(); k++) {
-        jQuery.cookie(this.keys[k], null);
+        $.cookie(this.keys[k], null);
       }
       this.keys = [];
     }
@@ -128,6 +133,7 @@ Model.Storage = {
   },
 
   contains: function (key) {
+    var contains_key, k;
     contains_key = false;
     for (k = 0; k < this.length(); k++) {
       if (this.key(k) == key) {

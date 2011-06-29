@@ -1,16 +1,22 @@
 var Model = function(name, options) {
+  var class_methods, instance_methods, required_attrs, default_attrs, belongs_to;
+  var has_one, has_many, has_and_belongs_to_many, model;
   
-  options                     = options                         || {};
-  var class_methods           = options.class_methods           || {};
-  var instance_methods        = options.instance_methods        || {};
-  var required_attrs          = options.required_attrs          || [];
-  var default_attrs           = options.default_attrs           || [];
-  var belongs_to              = options.belongs_to              || {};
-  var has_one                 = options.has_one                 || {};
-  var has_many                = options.has_many                || {};
-  var has_and_belongs_to_many = options.has_and_belongs_to_many || {};
+  options                 = options                         || {};
+  class_methods           = options.class_methods           || {};
+  instance_methods        = options.instance_methods        || {};
+  required_attrs          = options.required_attrs          || [];
+  default_attrs           = options.default_attrs           || [];
+  belongs_to              = options.belongs_to              || {};
+  has_one                 = options.has_one                 || {};
+  has_many                = options.has_many                || {};
+  has_and_belongs_to_many = options.has_and_belongs_to_many || {};
   
-  var model = function(attributes, options){
+  model = function(attributes, options){
+    var self, key;
+    
+    self = this;
+    
     options                 = options           || {};
     options.skip_save       = options.skip_save || false;
     attributes              = attributes        || {};
@@ -18,8 +24,6 @@ var Model = function(name, options) {
     this.errors             = []; // validation errors array
     this.state              = 'new';
     this.changed_attributes = {}; // keep track of change attributes
-    
-    var self = this;
     
     $.each(this.constructor.required_attrs, function(i,v){
       if(typeof attributes[v] == 'undefined'){
@@ -34,7 +38,7 @@ var Model = function(name, options) {
     });
     
     // create getters and setters for the attributes
-    for(var key in attributes){
+    for(key in attributes){
       if(attributes.hasOwnProperty(key)) {
         this.add_getter_setter(key);
       }
@@ -69,7 +73,7 @@ var Model = function(name, options) {
     this.attrs.id = this.constructor.next_id();
     
     // set attributes
-    for(var key in attributes){
+    for(key in attributes){
       if(attributes.hasOwnProperty(key)) {
         this["set_"+key](attributes[key]);
       }
