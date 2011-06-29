@@ -96,7 +96,7 @@ Model.ClassMethods = {
     
     self = this;
     if (Model.Storage.contains(this.model_name)) {
-      items = Model.Storage.getObject(this.model_name);
+      items = Model.Storage.getItem(this.model_name);
       $.each(items, function(i, item) {
         var model;
         
@@ -111,7 +111,7 @@ Model.ClassMethods = {
   },
   
   write_to_store: function() {
-    Model.Storage.setObject(
+    Model.Storage.setItem(
       this.model_name,
       $.map(
         this._model_items,

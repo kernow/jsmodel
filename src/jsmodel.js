@@ -95,7 +95,8 @@ var Model = function(name, options) {
                 Model.ClassMethods,
                 Model.Reflections,
                 class_methods,
-                { required_attrs:           required_attrs,
+                { Storage:                  Model.Storage,
+                  required_attrs:           required_attrs,
                   default_attrs:            default_attrs,
                   belongs_to:               belongs_to,
                   has_one:                  has_one,
@@ -116,6 +117,9 @@ var Model = function(name, options) {
   
   // add reflections
   model.add_reflections_for_self();
+  
+  // set the storage type or default to session storage
+  model.Storage.initialize(options.storage || Model.Storage.Memory);
   
   Model._add(model, name);
   

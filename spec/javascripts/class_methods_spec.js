@@ -136,30 +136,30 @@ describe("class methods", function() {
   
   describe("load", function() {
     
-    beforeEach(function() {
-      user1 = new User({ name: 'Bill' });
-      user2 = new User({ name: 'Ben' });
-      user3 = new User({ name: 'Bob' });
-    }); // end before
-    
-    it("should load records from local storage", function() {
-      // clear the records from memory but not local storage
-      User._model_items = [];
-      User.load();
-      
-      expect(User.all().length).toEqual(3);
-    }); // end it
-    
-    it("should clear records from memory before loading", function() {
-      User.load();
-      expect(User.all().length).toEqual(3);
-    }); // end it
-    
-    it("should raise an after_load event for each record loaded", function() {
-      var user_mock = new Mock(User);
-      User.expects('trigger').passing('after_load', Match.an_array).times(3);
-      User.load();
-    }); // end it
+    // beforeEach(function() {
+    //   user1 = new User({ name: 'Bill' });
+    //   user2 = new User({ name: 'Ben' });
+    //   user3 = new User({ name: 'Bob' });
+    // }); // end before
+    // 
+    // it("should load records from local storage", function() {
+    //   // clear the records from memory but not local storage
+    //   User._model_items = [];
+    //   User.load();
+    //   
+    //   expect(User.all().length).toEqual(3);
+    // }); // end it
+    // 
+    // it("should clear records from memory before loading", function() {
+    //   User.load();
+    //   expect(User.all().length).toEqual(3);
+    // }); // end it
+    // 
+    // it("should raise an after_load event for each record loaded", function() {
+    //   var user_mock = new Mock(User);
+    //   User.expects('trigger').passing('after_load', Match.an_array).times(3);
+    //   User.load();
+    // }); // end it
     
   }); // end describe
   
