@@ -1,3 +1,5 @@
+/*global Model: false */
+
 describe("class methods", function() {
   
   var User, user1, user2, user3;

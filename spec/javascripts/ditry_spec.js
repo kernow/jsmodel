@@ -1,3 +1,5 @@
+/*global Model: false */
+
 describe("dirty", function() {
   
   var User, user;
@@ -139,7 +141,7 @@ describe("dirty", function() {
       user.set_rooms([room]);
       user.save();
       expect(user.changed()).toBeFalsy();
-      user.remove_rooms([room])
+      user.remove_rooms([room]);
       expect(user.changed()).toBeTruthy();
       user.save();
       expect(user.changed()).toBeFalsy();
@@ -149,7 +151,7 @@ describe("dirty", function() {
       user.set_rooms([room]);
       user.save();
       expect(user.changed()).toBeFalsy();
-      user.remove_rooms_ids([room.id()])
+      user.remove_rooms_ids([room.id()]);
       expect(user.changed()).toBeTruthy();
       user.save();
       expect(user.changed()).toBeFalsy();

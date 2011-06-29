@@ -1,6 +1,7 @@
 describe("Model.Storage", function() {
 
   var jsonObject = ["test value", { nested: "test value 2" }];
+/*global Model: false */
 
   beforeEach(function() {
     Model.Storage.clear();

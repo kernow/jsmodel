@@ -1,3 +1,5 @@
+/*global Model: false */
+
 describe('Model', function () {
   
   var User;

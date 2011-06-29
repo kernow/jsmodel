@@ -1,3 +1,5 @@
+/*global Model: false */
+
 describe("associations", function() {
   
   var User, Room, jamie, frank, eddie, pjc_room, diy_room;
@@ -235,7 +237,7 @@ describe("associations", function() {
   
   describe("has_many and belongs_to", function() {
     
-    var Keycard, pjc_key1, pjc_key2, diy_key1, diy_key2;
+    var Keycard, pjc_key1, pjc_key2, pjc_key3, diy_key1, diy_key2;
     
     beforeEach(function() {
       User = Model('user', {
@@ -506,9 +508,9 @@ describe("associations", function() {
         pjc_room = new Room({ name: 'Pearl Jam concert' });
         diy_room = new Room({ name: 'DIY Enthusiasts' });
         
-        var m = new Mock(frank);
-        var m = new Mock(jamie);
-        var m = new Mock(eddie);
+        new Mock(frank);
+        new Mock(jamie);
+        new Mock(eddie);
       });
 
       it("should save the associated record", function() {
@@ -546,12 +548,12 @@ describe("associations", function() {
         pjc_room = new Room({ name: 'Pearl Jam concert' });
         diy_room = new Room({ name: 'DIY Enthusiasts' });
         
-        var m = new Mock(frank);
-        var m = new Mock(jamie);
-        var m = new Mock(eddie);
+        new Mock(frank);
+        new Mock(jamie);
+        new Mock(eddie);
         
-        var m = new Mock(pjc_room);
-        var m = new Mock(diy_room);
+        new Mock(pjc_room);
+        new Mock(diy_room);
       });
 
       it("should save the associated record", function() {

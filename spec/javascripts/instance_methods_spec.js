@@ -1,3 +1,5 @@
+/*global Model: false */
+
 describe("instance methods", function() {
   
   var User, user;
@@ -34,7 +36,7 @@ describe("instance methods", function() {
   
   describe("remove", function() {
     
-    var user2
+    var user2;
     
     beforeEach(function() {
       User = Model('user');
@@ -62,7 +64,7 @@ describe("instance methods", function() {
   
   describe("update", function() {
     
-    var user2
+    var user2;
     
     beforeEach(function() {
       User = Model('user');
@@ -101,7 +103,7 @@ describe("instance methods", function() {
   
   describe("flatten", function() {
     
-    var user2
+    var user2;
     
     beforeEach(function() {
       User = Model('user');
