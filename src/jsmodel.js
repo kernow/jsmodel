@@ -11,12 +11,12 @@ var Model = function(name, options) {
   var has_and_belongs_to_many = options.has_and_belongs_to_many || {};
   
   var model = function(attributes, options){
-    options           = options           || {};
-    options.skip_save = options.skip_save || false;
-    attributes  = attributes || {};
-    this.attrs  = {}; // model attributes object
-    this.errors = []; // validation errors array
-    this.state  = 'new';
+    options                 = options           || {};
+    options.skip_save       = options.skip_save || false;
+    attributes              = attributes        || {};
+    this.attrs              = {}; // model attributes object
+    this.errors             = []; // validation errors array
+    this.state              = 'new';
     this.changed_attributes = {}; // keep track of change attributes
     
     var self = this;
