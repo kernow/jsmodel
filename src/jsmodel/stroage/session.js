@@ -11,7 +11,11 @@ Model.Storage.Session = {
   description: 'session storage',
   
   supported: function() {
-    return typeof window.sessionStorage != 'undefined';
+    try {
+      return !!window.sessionStorage.getItem;
+    } catch(e){
+      return false;
+    }
   },
   
   getItem: function (key) {

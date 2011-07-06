@@ -23,18 +23,22 @@ describe("class Storage", function() {
       }); // end it
     }); // end describe
     
-    describe("session", function() {
+    if(Model.Storage.Session.supported()){
+    
+      describe("session", function() {
       
-      beforeEach(function() {
-        User = Model('user', { storage: Model.Storage.Session });
-        new Mock(Model.Storage.Session);
-      }); // end before
+        beforeEach(function() {
+          User = Model('user', { storage: Model.Storage.Session });
+          new Mock(Model.Storage.Session);
+        }); // end before
       
-      it("should use the session storage", function() {
-        Model.Storage.Session.expects('setItem');
-        var user = new User();
-      }); // end it
-    }); // end describe
+        it("should use the session storage", function() {
+          Model.Storage.Session.expects('setItem');
+          var user = new User();
+        }); // end it
+      }); // end describe
+    
+    }
     
     describe("cookie", function() {
       
