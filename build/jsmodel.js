@@ -1,42 +1,90 @@
+/*jslint browser: true */ /*global jQuery: true */
+
+/**
+ * jQuery Cookie plugin
+ *
+ * Copyright (c) 2010 Klaus Hartl (stilbuero.de)
+ * Dual licensed under the MIT and GPL licenses:
+ * http://www.opensource.org/licenses/mit-license.php
+ * http://www.gnu.org/licenses/gpl.html
+ *
+ */
 
 
+/**
+ * Create a cookie with the given key and value and other optional parameters.
+ *
+ * @example $.cookie('the_cookie', 'the_value');
+ * @desc Set the value of a cookie.
+ * @example $.cookie('the_cookie', 'the_value', { expires: 7, path: '/', domain: 'jquery.com', secure: true });
+ * @desc Create a cookie with all available options.
+ * @example $.cookie('the_cookie', 'the_value');
+ * @desc Create a session cookie.
+ * @example $.cookie('the_cookie', null);
+ * @desc Delete a cookie by passing null as value. Keep in mind that you have to use the same path and domain
+ *       used when the cookie was set.
+ *
+ * @param String key The key of the cookie.
+ * @param String value The value of the cookie.
+ * @param Object options An object literal containing key/value pairs to provide optional cookie attributes.
+ * @option Number|Date expires Either an integer specifying the expiration date from now on in days or a Date object.
+ *                             If a negative value is specified (e.g. a date in the past), the cookie will be deleted.
+ *                             If set to null or omitted, the cookie will be a session cookie and will not be retained
+ *                             when the the browser exits.
+ * @option String path The value of the path atribute of the cookie (default: path of page that created the cookie).
+ * @option String domain The value of the domain attribute of the cookie (default: domain of page that created the cookie).
+ * @option Boolean secure If true, the secure attribute of the cookie will be set and the cookie transmission will
+ *                        require a secure protocol (like HTTPS).
+ * @type undefined
+ *
+ * @name $.cookie
+ * @cat Plugins/Cookie
+ * @author Klaus Hartl/klaus.hartl@stilbuero.de
+ */
 
-jQuery.cookie = function(name, value, options) {
-    if (typeof value != 'undefined') { // name and value given, set cookie
-        options = options || {};
-        if (value === null) {
-            value = '';
+/**
+ * Get the value of a cookie with the given key.
+ *
+ * @example $.cookie('the_cookie');
+ * @desc Get the value of a cookie.
+ *
+ * @param String key The key of the cookie.
+ * @return The value of the cookie.
+ * @type String
+ *
+ * @name $.cookie
+ * @cat Plugins/Cookie
+ * @author Klaus Hartl/klaus.hartl@stilbuero.de
+ */
+jQuery.cookie = function (key, value, options) {
+
+    if (arguments.length > 1 && String(value) !== "[object Object]") {
+        options = jQuery.extend({}, options);
+
+        if (value === null || value === undefined) {
             options.expires = -1;
         }
-        var expires = '';
-        if (options.expires && (typeof options.expires == 'number' || options.expires.toUTCString)) {
-            var date;
-            if (typeof options.expires == 'number') {
-                date = new Date();
-                date.setTime(date.getTime() + (options.expires * 24 * 60 * 60 * 1000));
-            } else {
-                date = options.expires;
-            }
-            expires = '; expires=' + date.toUTCString(); // use expires attribute, max-age is not supported by IE
+
+        if (typeof options.expires === 'number') {
+            var days = options.expires, t = options.expires = new Date();
+            t.setDate(t.getDate() + days);
         }
-        var path = options.path ? '; path=' + (options.path) : '';
-        var domain = options.domain ? '; domain=' + (options.domain) : '';
-        var secure = options.secure ? '; secure' : '';
-        document.cookie = [name, '=', encodeURIComponent(value), expires, path, domain, secure].join('');
-    } else { // only name given, get cookie
-        var cookieValue = null;
-        if (document.cookie && document.cookie != '') {
-            var cookies = document.cookie.split(';');
-            for (var i = 0; i < cookies.length; i++) {
-                var cookie = jQuery.trim(cookies[i]);
-                if (cookie.substring(0, name.length + 1) == (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
+
+        value = String(value);
+
+        return (document.cookie = [
+            encodeURIComponent(key), '=',
+            options.raw ? value : encodeURIComponent(value),
+            options.expires ? '; expires=' + options.expires.toUTCString() : '', // use expires attribute, max-age is not supported by IE
+            options.path ? '; path=' + options.path : '',
+            options.domain ? '; domain=' + options.domain : '',
+            options.secure ? '; secure' : ''
+        ].join(''));
     }
+
+    options = value || {};
+    var result, decode = options.raw ? function (s) { return s; } : decodeURIComponent;
+    return (result = new RegExp('(?:^|; )' + encodeURIComponent(key) + '=([^;]*)').exec(document.cookie)) ? decode(result[1]) : null;
 };
 /*
 Copyright (c) 2010 Ryan Schuft (ryan.schuft@gmail.com)
@@ -695,27 +743,31 @@ if (!String.prototype.ordinalize)
     };
 }
 var Model = function(name, options) {
+  var class_methods, instance_methods, required_attrs, default_attrs, belongs_to;
+  var has_one, has_many, has_and_belongs_to_many, model;
 
-  options                     = options                         || {};
-  var class_methods           = options.class_methods           || {};
-  var instance_methods        = options.instance_methods        || {};
-  var required_attrs          = options.required_attrs          || [];
-  var default_attrs           = options.default_attrs           || [];
-  var belongs_to              = options.belongs_to              || {};
-  var has_one                 = options.has_one                 || {};
-  var has_many                = options.has_many                || {};
-  var has_and_belongs_to_many = options.has_and_belongs_to_many || {};
+  options                 = options                         || {};
+  class_methods           = options.class_methods           || {};
+  instance_methods        = options.instance_methods        || {};
+  required_attrs          = options.required_attrs          || [];
+  default_attrs           = options.default_attrs           || [];
+  belongs_to              = options.belongs_to              || {};
+  has_one                 = options.has_one                 || {};
+  has_many                = options.has_many                || {};
+  has_and_belongs_to_many = options.has_and_belongs_to_many || {};
 
-  var model = function(attributes, options){
-    options           = options           || {};
-    options.skip_save = options.skip_save || false;
-    attributes  = attributes || {};
-    this.attrs  = {}; // model attributes object
-    this.errors = []; // validation errors array
-    this.state  = 'new';
+  model = function(attributes, options){
+    var self, key;
+
+    self = this;
+
+    options                 = options           || {};
+    options.skip_save       = options.skip_save || false;
+    attributes              = attributes        || {};
+    this.attrs              = {}; // model attributes object
+    this.errors             = []; // validation errors array
+    this.state              = 'new';
     this.changed_attributes = {}; // keep track of change attributes
-
-    var self = this;
 
     $.each(this.constructor.required_attrs, function(i,v){
       if(typeof attributes[v] == 'undefined'){
@@ -729,7 +781,7 @@ var Model = function(name, options) {
       }
     });
 
-    for(var key in attributes){
+    for(key in attributes){
       if(attributes.hasOwnProperty(key)) {
         this.add_getter_setter(key);
       }
@@ -757,7 +809,7 @@ var Model = function(name, options) {
 
     this.attrs.id = this.constructor.next_id();
 
-    for(var key in attributes){
+    for(key in attributes){
       if(attributes.hasOwnProperty(key)) {
         this["set_"+key](attributes[key]);
       }
@@ -778,7 +830,8 @@ var Model = function(name, options) {
                 Model.ClassMethods,
                 Model.Reflections,
                 class_methods,
-                { required_attrs:           required_attrs,
+                { Storage:                  Model.Storage,
+                  required_attrs:           required_attrs,
                   default_attrs:            default_attrs,
                   belongs_to:               belongs_to,
                   has_one:                  has_one,
@@ -798,6 +851,8 @@ var Model = function(name, options) {
 
   model.add_reflections_for_self();
 
+  model.Storage.initialize(options.storage || Model.Storage.Memory);
+
   Model._add(model, name);
 
   return model;
@@ -816,6 +871,8 @@ Model._add = function(obj, name){
 Model._remove = function(name){
   Model._models[name] = undefined;
 };
+/*global Model: false */
+
 Model.Associations = {
 
   add_belongs_to: function(k) {
@@ -841,12 +898,16 @@ Model.Associations = {
 
   add_has_one: function(k) {
     this['get_'+k] = function(){
-      var obj = {};
+      var obj;
+
+      obj = {};
       obj[this.model_name()+'_id'] = this.id();
       return Model.find_by_name(k).find(obj)[0];
     };
     this['set_'+k] = function(model){
-      var association = this['get_'+k]();
+      var association;
+
+      association = this['get_'+k]();
       if(association){
         association['set_'+this.model_name()+'_id'](undefined);
       }
@@ -857,14 +918,20 @@ Model.Associations = {
   },
 
   add_has_many: function(k) {
-    var self = this;
+    var self;
+
+    self = this;
     this['get_'+k] = function(){
-      var obj = {};
+      var obj;
+
+      obj = {};
       obj[this.model_name()+'_id'] = this.id();
       return Model.find_by_name(k.singularize()).find(obj);
     };
     this['set_'+k] = function(models){
-      var obj = {};
+      var obj;
+
+      obj = {};
       obj[this.model_name()+'_id'] = this.id();
       $.each(Model.find_by_name(k.singularize()).find(obj), function(i,model){
         model['set_'+self.model_name()+'_id'](undefined);
@@ -884,7 +951,9 @@ Model.Associations = {
   },
 
   add_has_and_belongs_to_many: function(k){
-    var self = this;
+    var self;
+
+    self = this;
     this.attrs[k+'_ids'] = [];
 
     this['get_'+k] = function(){
@@ -894,12 +963,15 @@ Model.Associations = {
       return this.attrs[k+'_ids'];
     };
     this['set_'+k] = function(models){
-      var new_ids = $.map(models, function(model,i){ return model.id(); });
+      var new_ids, obj;
+
+      new_ids = $.map(models, function(model,i){ return model.id(); });
       if(this.attrs[k+'_ids'] != new_ids){
         this.will_change(k+'_ids');
       }
       this.attrs[k+'_ids'] = new_ids;
-      var obj = {};
+
+      obj = {};
       obj[this.model_name().pluralize()+'_ids'] = function(r){ return $.inArray(self.id(), r) > -1; };
       $.each(Model.find_by_name(k.singularize()).find(obj), function(i,model){
         model['remove_'+self.model_name().pluralize()+'_ids']([self.id()]);
@@ -931,7 +1003,9 @@ Model.Associations = {
     };
     this['remove_'+k] = function(models){
       $.each(models, function(i,model){
-        var pos = $.inArray(model.id(), self.attrs[k+'_ids']);
+        var pos;
+
+        pos = $.inArray(model.id(), self.attrs[k+'_ids']);
         if(pos > -1){
           self.will_change(k+'_ids');
           self.attrs[k+'_ids'].splice(pos,1);
@@ -941,7 +1015,9 @@ Model.Associations = {
     };
     this['remove_'+k+'_ids'] = function(ids){
       $.each(ids, function(i,id){
-        var pos = $.inArray(id, self.attrs[k+'_ids']);
+        var pos;
+
+        pos = $.inArray(id, self.attrs[k+'_ids']);
         if(pos > -1){
           self.will_change(k+'_ids');
           self.attrs[k+'_ids'].splice(pos,1);
@@ -951,7 +1027,9 @@ Model.Associations = {
   },
 
   save_associated_records: function(dirty_attributes){
-    var self = this;
+    var self;
+
+    self = this;
     this.with_each_reflection(function(type, key){
       switch(type){
         case "has_many":
@@ -978,7 +1056,9 @@ Model.Associations = {
   },
 
   with_each_reflection: function(block){
-    var self = this;
+    var self;
+
+    self = this;
     $.each(this.reflections(), function(i,r){
       $.each(r, function(k,v){
         block(k,v);
@@ -987,7 +1067,9 @@ Model.Associations = {
   },
 
   remove_associtions: function(){
-    var self = this;
+    var self;
+
+    self = this;
     $.each(this.reflections(), function(i,r){
       $.each(r, function(k,v){
         switch(k){
@@ -1016,20 +1098,24 @@ Model.Associations = {
   }
 
 };
+/*global Model: false */
+
 Model.ClassMethods = {
 
 
   valid_required_attrs: function(model, attrs){
-    var required_attrs = {};
+    var required_attrs, key, obj;
+
+    required_attrs = {};
     $.each(this.required_attrs, function(i,v){ required_attrs[v] = undefined; });
-    for(var key in required_attrs){
+    for(key in required_attrs){
       if (required_attrs.hasOwnProperty(key)) {
         if(typeof model.attrs[key] == 'undefined'){
-          var obj = {};
+          obj = {};
           obj[key] = 'is required';
           model.errors.push(obj);
         } else if(model.attrs[key] === ''){
-          var obj = {};
+          obj = {};
           obj[key] = 'cannot be blank';
           model.errors.push(obj);
         }
@@ -1042,10 +1128,14 @@ Model.ClassMethods = {
   },
 
   find: function(options) {
-    var self = this;
+    var self;
+
+    self = this;
     return $.grep(this._model_items, function(item, i){
-      var options_has_properties = false;
-      for(var k in options){
+      var options_has_properties, k;
+
+      options_has_properties = false;
+      for(k in options){
         options_has_properties = true;
         if(self.is_function(options[k])){
           if(typeof item.attrs[k] != 'undefined'){
@@ -1082,7 +1172,9 @@ Model.ClassMethods = {
   },
 
   next_id: function(){
-    var id = -1;
+    var id;
+
+    id = -1;
     $.each(this._model_items, function(i,o){ if(o.id() > id){ id = o.id(); }});
     return id+1;
   },
@@ -1094,13 +1186,17 @@ Model.ClassMethods = {
   },
 
   load: function() {
+    var self, items;
+
     this._model_items = [];
 
-    var self = this;
+    self = this;
     if (Model.Storage.contains(this.model_name)) {
-      var items = Model.Storage.getObject(this.model_name);
+      items = Model.Storage.getItem(this.model_name);
       $.each(items, function(i, item) {
-        var model = new self(item, { skip_save: true });
+        var model;
+
+        model = new self(item, { skip_save: true });
         self._model_items.push(model);
         model.state = 'saved';
         self.trigger('after_load', [model]);
@@ -1111,7 +1207,7 @@ Model.ClassMethods = {
   },
 
   write_to_store: function() {
-    Model.Storage.setObject(
+    Model.Storage.setItem(
       this.model_name,
       $.map(
         this._model_items,
@@ -1125,13 +1221,17 @@ Model.ClassMethods = {
   }
 
 };
+/*global Model: false */
+
 Model.Dirty = {
 
   will_change: function(key){
+    var value;
+
     if($.isArray(this.attrs[key])){
-      var value = $.extend([], this.attrs[key]);
+      value = $.extend([], this.attrs[key]);
     }else{
-      var value = this.attrs[key];
+      value = this.attrs[key];
     }
     this.changed_attributes[key] = { old: value };
   },
@@ -1145,7 +1245,9 @@ Model.Dirty = {
   },
 
   changed_attributes_count: function(){
-    var count = 0, k;
+    var count, k;
+
+    count = 0;
     for(k in this.changed_attributes) {
       if (this.changed_attributes.hasOwnProperty(k)) {
         ++count;
@@ -1161,6 +1263,8 @@ Model.Dirty = {
   }
 
 };
+/*global Model: false */
+
 Model.Events = {
 
   bind: function(event, callback) {
@@ -1170,10 +1274,12 @@ Model.Events = {
   },
 
   trigger: function(name, data) {
-    var events = this.events[name];
+    var events, i;
+
+    events = this.events[name];
 
     if (events) {
-      for (var i = 0; i < events.length; i++) {
+      for (i = 0; i < events.length; i++) {
         events[i].apply(this, data || []);
       }
     }
@@ -1182,10 +1288,12 @@ Model.Events = {
   },
 
   unbind: function(event, callback) {
-    if (callback) {
-      var events = this.events[event] || [];
+    var events, i;
 
-      for (var i = 0; i < events.length; i++) {
+    if (callback) {
+      events = this.events[event] || [];
+
+      for (i = 0; i < events.length; i++) {
         if (events[i] === callback) {
           this.events[event].splice(i, 1);
         }
@@ -1197,6 +1305,8 @@ Model.Events = {
     return this;
   }
 };
+/*global Model: false */
+
 Model.InstanceMethods = {
 
   id: function(){
@@ -1230,9 +1340,10 @@ Model.InstanceMethods = {
   },
 
   remove: function() {
+    var self, deleted_item;
+
     this.constructor.trigger('before_remove', [this]);
-    var self = this;
-    var deleted_item;
+    self = this;
     $.each(this.constructor._model_items, function(i, item){
       if(item.id() == self.id()){
         deleted_item = self.constructor._model_items.splice(i, 1);
@@ -1246,11 +1357,13 @@ Model.InstanceMethods = {
   },
 
   update: function(attrs) {
+    var updated, key, current_value;
+
     this.constructor.trigger('before_update', [this]);
-    var updated = false;
-    for(var key in attrs){
+    updated = false;
+    for(key in attrs){
       if (attrs.hasOwnProperty(key)) {
-        var current_value = this.attrs[key];
+        current_value = this.attrs[key];
         if(current_value != attrs[key]){
           this["set_"+key](attrs[key]);
           updated = true;
@@ -1269,6 +1382,8 @@ Model.InstanceMethods = {
   },
 
   save: function() {
+    var dirty_attributes;
+
     if(this.valid()) {
       this.constructor.trigger('before_save', [this]);
       if(this.state == 'new'){ // new record
@@ -1276,7 +1391,7 @@ Model.InstanceMethods = {
       }else{ // updating an existing record
         this.constructor.write_to_store();
       }
-      var dirty_attributes = this.clear_dirty();
+      dirty_attributes = this.clear_dirty();
       this.save_associated_records(dirty_attributes);
       this.constructor.trigger('after_save', [this]);
       return true;
@@ -1286,18 +1401,26 @@ Model.InstanceMethods = {
   },
 
   flatten: function() {
-    var attrs = $.extend({}, this.attrs);
+    var attrs;
+
+    attrs = $.extend({}, this.attrs);
     return attrs;
   }
 
 };
+/*global Model: false */
+
 Model.Reflections = {
 
   add_reflections_for_self: function(){
-    var self = this;
+    var self;
+
+    self = this;
     $.each({ has_many: this.has_many, belongs_to: this.belongs_to, has_and_belongs_to_many: this.has_and_belongs_to_many }, function(key,association){
       $.each(association, function(k,v){
-        var obj = {};
+        var obj;
+
+        obj = {};
         obj[key] = k;
         self.add_reflection(obj);
       });
@@ -1312,133 +1435,57 @@ Model.Reflections = {
     return this._reflections;
   }
 };
+/*global Model: false */
+
 Model.Storage = {
 
-  sessionStorage: typeof window.sessionStorage != 'undefined' ? window.sessionStorage : null,
+  engine: null,
 
-  keys: [],
-
-
-  length: function() {
-    if (this.sessionStorage) {
-      return this.sessionStorage.length;
-    } else {
-      return this.keys.length;
+  initialize: function(engines){
+    var engines_tried;
+    engines_tried = [];
+    if(!$.isArray(engines)){
+      engines = [engines];
     }
-  },
-
-  key: function (index) {
-    if (index >= this.length()) {
-      return null;
-    } else {
-      if (this.sessionStorage) {
-        return this.sessionStorage.key(index);
-      } else {
-        return this.keys[index];
+    $.each(engines, function(i,engine){
+      if(engine.supported()){
+        Model.Storage.engine = engine;
+        return false;
+      }else{
+        engines_tried.push(engine.description);
       }
+    });
+    if(Model.Storage.engine === null){
+      console.error("No supported engine found, tried: " + engines_tried.join(', '));
     }
   },
 
-  getItem: function (key) {
-    if (this.sessionStorage) {
-      var item = this.sessionStorage.getItem(key);
-      if(item === null){
-        return item;
-      }else if(typeof item.value == 'undefined'){ // FF 3.0 impliments .value
-        return item;
-      } else {
-        return item.value;
-      }
-    } else {
-      return jQuery.cookie(key);
-    }
+  supported: function() {
+    return this.engine.supported();
   },
 
-  setItem: function (key, value) {
-    if (this.sessionStorage) {
-      this.sessionStorage.removeItem(key); // Added in to try and fix support on the iPad
-      this.sessionStorage.setItem(key, value);
-    } else {
-      jQuery.cookie(key, value);
-      if (!this.contains(key)) {
-        this.keys.push(key);
-      }
-    }
+  getItem: function(key) {
+    return this.engine.getItem(key);
   },
 
-  removeItem: function (key) {
-    if (this.sessionStorage) {
-      this.sessionStorage.removeItem(key);
-    } else {
-      for (var k = 0; k < this.length(); k++) {
-        if (this.keys[k] == key) {
-          jQuery.cookie(key, null);
-          if (k == this.length() - 1) {
-            this.keys.pop();
-          } else {
-            delete this.keys[k];
-            this.keys[k] = this.keys.pop();
-          }
-        }
-      }
-    }
+  setItem: function(key, value) {
+    return this.engine.setItem(key, value);
   },
 
-  clear: function () {
-    if (this.sessionStorage) {
-      if(typeof this.sessionStorage.clear != "undefined"){
-        this.sessionStorage.clear();
-      }else{ // FF 3.0 doesn't support the clear method so we need to impliment it
-        var len = this.sessionStorage.length;
-        var keys = [];
-        for(i=0;i<len;i++){
-          keys.push(this.sessionStorage.key(i));
-        }
-        var self = this;
-        $.each(keys, function(i, key){
-          self.sessionStorage.removeItem(key);
-        });
-      }
-    } else {
-      for (k = 0; k < this.length(); k++) {
-        jQuery.cookie(this.keys[k], null);
-      }
-      this.keys = [];
-    }
+  removeItem: function(key) {
+    return this.engine.removeObject(key);
   },
 
-
-  getObject: function (key) {
-    if (this.contains(key)) {
-      return JSON.parse(this.getItem(key), this.reviver);
-    } else {
-      return null;
-    }
+  contains: function(key) {
+    return this.engine.contains(key);
   },
 
-  reviver: function(key, value) {
-    var a;
-    if (typeof value === 'string') {
-      a = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)(Z|([+\-])(\d{2}):(\d{2}))$/.exec(value);
-      if (a) {
-        return new Date(Date.UTC( a[1], a[2] - 1, a[3], a[4], a[5], a[6]));
-      }
-    }
-    return value;
+  count: function() {
+    return this.engine.count();
   },
 
-  setObject: function (key, value) {
-    this.setItem(key, JSON.stringify(value));
-  },
-
-  contains: function (key) {
-    contains_key = false;
-    for (k = 0; k < this.length(); k++) {
-      if (this.key(k) == key) {
-        contains_key = true;
-        break;
-      }
-    }
-    return contains_key;
+  clear: function() {
+    return this.engine.clear();
   }
+
 };
