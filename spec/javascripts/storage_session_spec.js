@@ -148,7 +148,7 @@ describe("Model.Storage.Session", function() {
   
     describe("supported", function() {
   
-      it("should return false when supported", function() {
+      it("should return false when unsupported", function() {
         expect(Model.Storage.Session.supported()).toBeFalsy();
       }); // end it
     }); // end describe
