@@ -89,43 +89,47 @@ describe("class Storage", function() {
     
   }); // end describe
   
-  describe("Session backend", function() {
+  if(Model.Storage.Session.supported()){
+  
+    describe("Session backend", function() {
     
-    var user1, user2, user3;
-
-    beforeEach(function() {
-      User = Model('user', { storage: Model.Storage.Session });
-    });
-
-    describe("loading", function() {
+      var user1, user2, user3;
 
       beforeEach(function() {
-        user1 = new User({ name: 'Bill' });
-        user2 = new User({ name: 'Ben' });
-        user3 = new User({ name: 'Bob' });
-      }); // end before
+        User = Model('user', { storage: Model.Storage.Session });
+      });
 
-      it("should load records from local storage", function() {
-        // clear the records from memory but not local storage
-        User._model_items = [];
-        User.load();
+      describe("loading", function() {
 
-        expect(User.all().length).toEqual(3);
-      }); // end it
+        beforeEach(function() {
+          user1 = new User({ name: 'Bill' });
+          user2 = new User({ name: 'Ben' });
+          user3 = new User({ name: 'Bob' });
+        }); // end before
 
-      it("should clear records from memory before loading", function() {
-        User.load();
-        expect(User.all().length).toEqual(3);
-      }); // end it
+        it("should load records from local storage", function() {
+          // clear the records from memory but not local storage
+          User._model_items = [];
+          User.load();
 
-      it("should raise an after_load event for each record loaded", function() {
-        var user_mock = new Mock(User);
-        User.expects('trigger').passing('after_load', Match.an_array).times(3);
-        User.load();
-      }); // end it
+          expect(User.all().length).toEqual(3);
+        }); // end it
 
-    }); // end describe
+        it("should clear records from memory before loading", function() {
+          User.load();
+          expect(User.all().length).toEqual(3);
+        }); // end it
+
+        it("should raise an after_load event for each record loaded", function() {
+          var user_mock = new Mock(User);
+          User.expects('trigger').passing('after_load', Match.an_array).times(3);
+          User.load();
+        }); // end it
+
+      }); // end describe
     
-  }); // end describe
+    }); // end describe
+  
+  }
   
 }); // end describe
