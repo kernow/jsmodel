@@ -742,7 +742,7 @@ var Model = function(name, options) {
                 Model.ClassMethods,
                 Model.Reflections,
                 class_methods,
-                { Storage:                  Model.Storage,
+                { storage:                  {},
                   required_attrs:           required_attrs,
                   default_attrs:            default_attrs,
                   belongs_to:               belongs_to,
@@ -755,6 +755,8 @@ var Model = function(name, options) {
                 }
   );
 
+  jQuery.extend(model.storage, Model.Storage);
+
   jQuery.extend(model.prototype,
                 Model.InstanceMethods,
                 Model.Associations,
@@ -763,7 +765,7 @@ var Model = function(name, options) {
 
   model.add_reflections_for_self();
 
-  model.Storage.initialize(options.storage || Model.Storage.Default);
+  model.storage.initialize(options.storage || Model.Storage.Default);
 
   Model._add(model, name);
 
@@ -1103,8 +1105,8 @@ Model.ClassMethods = {
     this._model_items = [];
 
     self = this;
-    if (Model.Storage.contains(this.model_name)) {
-      items = Model.Storage.getItem(this.model_name);
+    if (this.storage.contains(this.model_name)) {
+      items = this.storage.getItem(this.model_name);
       $.each(items, function(i, item) {
         var model;
 
@@ -1119,7 +1121,7 @@ Model.ClassMethods = {
   },
 
   write_to_store: function() {
-    Model.Storage.setItem(
+    this.storage.setItem(
       this.model_name,
       $.map(
         this._model_items,
@@ -1351,23 +1353,23 @@ Model.Reflections = {
 
 Model.Storage = {
 
-  engine: null,
-
   initialize: function(engines){
-    var engines_tried;
+    var engines_tried, self;
     engines_tried = [];
+    self = this;
     if(!$.isArray(engines)){
       engines = [engines];
     }
     $.each(engines, function(i,engine){
       if(engine.supported()){
-        Model.Storage.engine = engine;
+        self.engine = engine;
+        console.log(self);
         return false;
       }else{
         engines_tried.push(engine.description);
       }
     });
-    if(Model.Storage.engine === null){
+    if(this.engine === null){
       console.error("No supported engine found, tried: " + engines_tried.join(', '));
     }
   },

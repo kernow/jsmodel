@@ -37,7 +37,7 @@ describe("class Storage", function() {
           var user = new User();
         }); // end it
       }); // end describe
-    
+      
     }
     
     describe("cookie", function() {
@@ -66,6 +66,25 @@ describe("class Storage", function() {
         Model.Storage.Cookie.expects('setItem');
         var user = new User();
       }); // end it
+    }); // end describe
+    
+    describe("multiple models", function() {
+      
+      var Car;
+      
+      beforeEach(function() {
+        User  = Model('user', { storage: Model.Storage.Default  });
+        Car   = Model('car',  { storage: Model.Storage.Cookie   });
+      }); // end before
+      
+      it("should have the memory backend for the user model", function() {
+        expect(User.storage.engine.description).toEqual('in memory storage');
+      }); // end it
+      
+      it("should have the cookie backend for the car model", function() {
+        expect(Car.storage.engine.description).toEqual('cookie storage');
+      }); // end it
+      
     }); // end describe
     
   }); // end describe

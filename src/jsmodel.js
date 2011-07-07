@@ -95,7 +95,7 @@ var Model = function(name, options) {
                 Model.ClassMethods,
                 Model.Reflections,
                 class_methods,
-                { Storage:                  Model.Storage,
+                { storage:                  {},
                   required_attrs:           required_attrs,
                   default_attrs:            default_attrs,
                   belongs_to:               belongs_to,
@@ -108,6 +108,8 @@ var Model = function(name, options) {
                 }
   );
   
+  jQuery.extend(model.storage, Model.Storage);
+  
   // add instance methods
   jQuery.extend(model.prototype,
                 Model.InstanceMethods,
@@ -119,7 +121,7 @@ var Model = function(name, options) {
   model.add_reflections_for_self();
   
   // set the storage type or default to in memory storage
-  model.Storage.initialize(options.storage || Model.Storage.Default);
+  model.storage.initialize(options.storage || Model.Storage.Default);
   
   Model._add(model, name);
   

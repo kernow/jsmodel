@@ -2,24 +2,24 @@
 
 Model.Storage = {
   
-  engine: null,
-  
   // initialize the storage engine and check it's supported on the platform
   initialize: function(engines){
-    var engines_tried;
+    var engines_tried, self;
     engines_tried = [];
+    self = this;
     if(!$.isArray(engines)){
       engines = [engines];
     }
     $.each(engines, function(i,engine){
       if(engine.supported()){
-        Model.Storage.engine = engine;
+        self.engine = engine;
+        console.log(self);
         return false;
       }else{
         engines_tried.push(engine.description);
       }
     });
-    if(Model.Storage.engine === null){
+    if(this.engine === null){
       console.error("No supported engine found, tried: " + engines_tried.join(', '));
     }
   },
