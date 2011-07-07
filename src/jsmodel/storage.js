@@ -13,7 +13,6 @@ Model.Storage = {
     $.each(engines, function(i,engine){
       if(engine.supported()){
         self.engine = engine;
-        console.log(self);
         return false;
       }else{
         engines_tried.push(engine.description);
