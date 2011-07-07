@@ -14,11 +14,11 @@ describe("class Storage", function() {
       
       beforeEach(function() {
         User = Model('user');
-        new Mock(Model.Storage.Memory);
+        new Mock(Model.Storage.Default);
       }); // end before
       
       it("should use the memory storage", function() {
-        Model.Storage.Memory.expects('setItem');
+        Model.Storage.Default.expects('setItem');
         var user = new User();
       }); // end it
     }); // end describe

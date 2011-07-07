@@ -257,16 +257,16 @@ describe('Model', function () {
     describe("in memory storage", function() {
       
       beforeEach(function() {
-        User = Model('user', { storage: Model.Storage.Memory });
-        new Mock(Model.Storage.Memory);
+        User = Model('user', { storage: Model.Storage.Default });
+        new Mock(Model.Storage.Default);
       }); // end before
       
       it("should not call write_to_store when creating a model", function() {
-        Model.Storage.Memory.expects('setItem').once();
+        Model.Storage.Default.expects('setItem').once();
         user = new User({ full_name: 'Jamie Dyer', title: 'Mr', age: 32 });
         // verify the expectations manually here because the User.reset() in the
         // after block causes the stogare engine to be run twice
-        expect(Model.Storage.Memory).verify_expectations();
+        expect(Model.Storage.Default).verify_expectations();
       }); // end it
       
     }); // end describe

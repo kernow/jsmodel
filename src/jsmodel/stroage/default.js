@@ -1,6 +1,6 @@
 /*global Model: false */
 
-Model.Storage.Memory = {
+Model.Storage.Default = {
   
   description: 'in memory storage',
   

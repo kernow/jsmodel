@@ -119,7 +119,7 @@ var Model = function(name, options) {
   model.add_reflections_for_self();
   
   // set the storage type or default to session storage
-  model.Storage.initialize(options.storage || Model.Storage.Memory);
+  model.Storage.initialize(options.storage || Model.Storage.Default);
   
   Model._add(model, name);
   
