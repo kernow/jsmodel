@@ -8,7 +8,7 @@ load 'sauce/jasmine/jasmine-sauce.rake'
 namespace :js do
   task :combine do
     secretary = Sprockets::Secretary.new(
-      :source_files => ["vendor/jquery.cookie.js", "vendor/inflection.js", "src/jsmodel.js", "src/jsmodel/**/*.js"]
+      :source_files => ["vendor/inflection.js", "src/jsmodel.js", "src/jsmodel/**/*.js"]
     )
     
     # Generate a Sprockets::Concatenation object from the source files
