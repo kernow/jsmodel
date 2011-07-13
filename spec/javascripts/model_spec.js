@@ -15,8 +15,7 @@ describe('Model', function () {
     
     beforeEach(function() {
       User = Model('user', {
-        required_attrs: ['full_name', 'title', 'age'],
-        default_attrs:  ['height', 'weight'],
+        attributes:  ['full_name', 'title', 'age', 'height', 'weight'],
         class_methods: {
           define_getters_setters: function(model){
             model.get_first_name  = function() { return model.attrs.full_name.split(' ')[0]; };
@@ -35,7 +34,7 @@ describe('Model', function () {
       });
     }); // end before
 
-    describe("required", function() {
+    describe("getting and setting", function() {
 
       beforeEach(function() {
         user = new User({ full_name: 'Jamie Dyer', title: 'Mr', age: 32 });
@@ -66,34 +65,6 @@ describe('Model', function () {
       }); // end it
 
     }); // end describe
-
-    describe("default", function() {
-
-      beforeEach(function() {
-        user = new User({ height: 178, weight: 100 });
-      }); // end before
-
-      it("should define getters", function() {
-        expect(user.get_height()).toEqual(178);
-        expect(user.get_weight()).toEqual(100);
-      }); // end it
-
-      it("should define setters", function() {
-        user.set_height(20);
-        user.set_weight(500);
-
-        expect(user.get_height()).toEqual(20);
-        expect(user.get_weight()).toEqual(500);
-      }); // end it
-
-      it("should define getters and setter when no data passed to the constructor", function() {
-        var invalid_user = new User();
-
-        expect(invalid_user.get_height()).toBeUndefined();
-        expect(invalid_user.get_height()).toBeUndefined();
-      }); // end it
-
-    }); // end describe
     
     describe("custom", function() {
       
@@ -115,79 +86,7 @@ describe('Model', function () {
       }); // end it
       
     }); // end describe
-  }); // end describe
-  
-  describe("validations", function() {
-    
-    beforeEach(function() {
-      User = Model('user', {
-        required_attrs: ['full_name', 'title', 'age'],
-        class_methods: {
-          validations: function(model, attrs) {
-            if(isNaN(attrs.age)){
-              model.errors.push({ age: 'must be a number' });
-            }
-            return model.errors.length < 1;
-          }
-        }
-      });
-    }); // end before
-    
-    it("should not pass when full_name is missing", function() {
-      user = new User({ title: 'Mr', age: 32 });
-      expect(user.valid()).toBeFalsy();
-      expect(user.errors.length).toEqual(1);
-      expect(user.errors[0].full_name).toEqual('is required');
-    }); // end it
-    
-    it("should not pass when title is missing", function() {
-      user = new User({ full_name: 'Jamie Dyer', age: 32 });
-      expect(user.valid()).toBeFalsy();
-      expect(user.errors.length).toEqual(1);
-      expect(user.errors[0].title).toEqual('is required');
-    }); // end it
-    
-    it("should not pass when age is missing", function() {
-      user = new User({ full_name: 'Jamie Dyer', title: 'Mr' });
-      expect(user.valid()).toBeFalsy();
-      expect(user.errors.length).toEqual(2);
-      expect(user.errors[1].age).toEqual('is required');
-    }); // end it
-    
-    it("should not pass when full_name is blank", function() {
-      user = new User({ full_name: '', title: 'Mr', age: 32 });
-      expect(user.valid()).toBeFalsy();
-      expect(user.errors.length).toEqual(1);
-      expect(user.errors[0].full_name).toEqual('cannot be blank');
-    }); // end it
-    
-    it("should not pass when title is blank", function() {
-      user = new User({ full_name: 'Jamie Dyer', title: '', age: 32 });
-      expect(user.valid()).toBeFalsy();
-      expect(user.errors.length).toEqual(1);
-      expect(user.errors[0].title).toEqual('cannot be blank');
-    }); // end it
-    
-    it("should not pass when age is blank", function() {
-      user = new User({ full_name: 'Jamie Dyer', title: 'Mr', age: '' });
-      expect(user.valid()).toBeFalsy();
-      expect(user.errors.length).toEqual(1);
-      expect(user.errors[0].age).toEqual('cannot be blank');
-    }); // end it
-    
-    it("should not pass when age is not a number", function() {
-      user = new User({ full_name: 'Jamie Dyer', title: 'Mr', age: 'fifteen' });
-      expect(user.valid()).toBeFalsy();
-      expect(user.errors.length).toEqual(1);
-      expect(user.errors[0].age).toEqual('must be a number');
-    }); // end it
-    
-    it("should pass when a requires attribute is set to 0", function() {
-      user = new User({ full_name: 0, title: 0, age: 0 });
-      expect(user.valid()).toBeTruthy();
-      expect(user.errors.length).toEqual(0);
-    }); // end it
-    
+
   }); // end describe
   
   describe("defining multiple models", function() {
@@ -199,15 +98,18 @@ describe('Model', function () {
     
     beforeEach(function() {
       User = Model('user', {
-        required_attrs: ['full_name', 'title', 'age']
+        attributes: ['full_name', 'title', 'age'],
+        validates_presence_of: ['full_name', 'title', 'age']
       });
       
       Book = Model('book', {
-        required_attrs: ['title', 'author']
+        attributes: ['title', 'author'],
+        validates_presence_of: ['title', 'author']
       });
       
       Car = Model('car', {
-        required_attrs: ['make']
+        attributes: ['make'],
+        validates_presence_of: 'make'
       });
     }); // end before
     

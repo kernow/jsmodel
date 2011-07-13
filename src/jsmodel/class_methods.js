@@ -2,28 +2,6 @@
 
 Model.ClassMethods = {
 
-  // _model_items: [],
-
-  valid_required_attrs: function(model, attrs){
-    var required_attrs, key, obj;
-    
-    required_attrs = {};
-    $.each(this.required_attrs, function(i,v){ required_attrs[v] = undefined; });
-    for(key in required_attrs){
-      if (required_attrs.hasOwnProperty(key)) {
-        if(typeof model.attrs[key] == 'undefined'){
-          obj = {};
-          obj[key] = 'is required';
-          model.errors.push(obj);
-        } else if(model.attrs[key] === ''){
-          obj = {};
-          obj[key] = 'cannot be blank';
-          model.errors.push(obj);
-        }
-      }
-    }
-  },
-
   all: function() {
     return this._model_items;
   },

@@ -13,7 +13,7 @@ describe("validations", function() {
     
     beforeEach(function() {
       User = Model('user', {
-        default_attrs: ['first_name', 'last_name'],
+        attributes: ['first_name', 'last_name'],
         validates_presence_of: ['last_name', 'first_name']
       });
     }); // end before
@@ -67,7 +67,7 @@ describe("validations", function() {
     
     beforeEach(function() {
       User = Model('user', {
-        required_attrs: ['first_name', 'last_name'],
+        attributes: ['first_name', 'last_name'],
         validates_uniqueness_of: 'last_name'
       });
       new User({ first_name: 'jamie', last_name: 'dyer' });

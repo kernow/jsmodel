@@ -1,12 +1,11 @@
 var Model = function(name, options) {
-  var class_methods, instance_methods, required_attrs, default_attrs, belongs_to;
+  var class_methods, instance_methods, attributes, belongs_to;
   var has_one, has_many, has_and_belongs_to_many, model, validation_rules;
   
   options                 = options                         || {};
   class_methods           = options.class_methods           || {};
   instance_methods        = options.instance_methods        || {};
-  required_attrs          = options.required_attrs          || [];
-  default_attrs           = options.default_attrs           || [];
+  attributes              = options.attributes              || [];
   belongs_to              = options.belongs_to              || {};
   has_one                 = options.has_one                 || {};
   has_many                = options.has_many                || {};
@@ -33,13 +32,7 @@ var Model = function(name, options) {
     this.state              = 'new';
     this.changed_attributes = {}; // keep track of change attributes
     
-    $.each(this.constructor.required_attrs, function(i,v){
-      if(typeof attributes[v] == 'undefined'){
-        attributes[v] = undefined;
-      }
-    });
-    
-    $.each(this.constructor.default_attrs, function(i,v){
+    $.each(this.constructor.attributes, function(i,v){
       if(typeof attributes[v] == 'undefined'){
         attributes[v] = undefined;
       }
@@ -105,8 +98,7 @@ var Model = function(name, options) {
                 class_methods,
                 { storage:                  {},
                   validate:                 {},
-                  required_attrs:           required_attrs,
-                  default_attrs:            default_attrs,
+                  attributes:               attributes,
                   belongs_to:               belongs_to,
                   has_one:                  has_one,
                   has_many:                 has_many,

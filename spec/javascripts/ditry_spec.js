@@ -14,7 +14,7 @@ describe("dirty", function() {
     
     beforeEach(function() {
       User = Model('user', {
-        default_attrs:  ['name', 'age', 'weight']
+        attributes:  ['name', 'age', 'weight']
       });
       user = new User({ name: 'Jamie', age: 12, weight: 'nothing' });
     }); // end before
@@ -43,12 +43,12 @@ describe("dirty", function() {
     
     beforeEach(function() {
       User = Model('user', {
-        default_attrs:  ['name', 'age', 'weight'],
+        attributes:  ['name', 'age', 'weight'],
         belongs_to: { room: {} }
       });
       
       Room = Model('room', {
-        default_attrs:  ['name', 'number'],
+        attributes:  ['name', 'number'],
         has_many: { users: {} }
       });
       
@@ -86,12 +86,12 @@ describe("dirty", function() {
     
     beforeEach(function() {
       User = Model('user', {
-        default_attrs:  ['name', 'age', 'weight'],
+        attributes:  ['name', 'age', 'weight'],
         has_and_belongs_to_many: { rooms: {} }
       });
       
       Room = Model('room', {
-        default_attrs:  ['name', 'number'],
+        attributes:  ['name', 'number'],
         has_and_belongs_to_many: { users: {} }
       });
       

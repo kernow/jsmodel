@@ -70,7 +70,7 @@ describe("associations", function() {
     
     beforeEach(function() {
       User = Model('user', {
-        default_attrs: ['room_id']
+        attributes: ['room_id']
       });
       Room = Model('room', {
         has_one: { user: {}}
@@ -133,7 +133,7 @@ describe("associations", function() {
     
     beforeEach(function() {
       User = Model('user', {
-        default_attrs: ['room_id']
+        attributes: ['room_id']
       });
       Room = Model('room', {
         has_many: { users: {}}

@@ -28,7 +28,6 @@ Model.InstanceMethods = {
       this.constructor.validations(this, this.attrs);
     }
     this.constructor.validate.validate_rules(this);
-    this.constructor.valid_required_attrs(this, this.attrs);
     if(!options.skip_callbacks){ this.constructor.trigger('after_validation', [this]); }
     return this.errors.length < 1;
   },
