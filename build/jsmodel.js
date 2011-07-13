@@ -655,18 +655,25 @@ if (!String.prototype.ordinalize)
     };
 }
 var Model = function(name, options) {
-  var class_methods, instance_methods, required_attrs, default_attrs, belongs_to;
-  var has_one, has_many, has_and_belongs_to_many, model;
+  var class_methods, instance_methods, attributes, belongs_to;
+  var has_one, has_many, has_and_belongs_to_many, model, validation_rules;
 
   options                 = options                         || {};
   class_methods           = options.class_methods           || {};
   instance_methods        = options.instance_methods        || {};
-  required_attrs          = options.required_attrs          || [];
-  default_attrs           = options.default_attrs           || [];
+  attributes              = options.attributes              || [];
   belongs_to              = options.belongs_to              || {};
   has_one                 = options.has_one                 || {};
   has_many                = options.has_many                || {};
   has_and_belongs_to_many = options.has_and_belongs_to_many || {};
+
+  validation_rules = {};
+  if (options.validates_uniqueness_of) {
+    validation_rules.uniqueness_of = options.validates_uniqueness_of;
+  }
+  if (options.validates_presence_of) {
+    validation_rules.presence_of = options.validates_presence_of;
+  }
 
   model = function(attributes, options){
     var self, key;
@@ -681,14 +688,8 @@ var Model = function(name, options) {
     this.state              = 'new';
     this.changed_attributes = {}; // keep track of change attributes
 
-    $.each(this.constructor.required_attrs, function(i,v){
+    $.each(this.constructor.attributes, function(i,v){
       if(typeof attributes[v] == 'undefined'){
-        attributes[v] = undefined;
-      }
-    });
-
-    $.each(this.constructor.default_attrs, function(i,v){
-      if(!attributes[v]){
         attributes[v] = undefined;
       }
     });
@@ -743,8 +744,8 @@ var Model = function(name, options) {
                 Model.Reflections,
                 class_methods,
                 { storage:                  {},
-                  required_attrs:           required_attrs,
-                  default_attrs:            default_attrs,
+                  validate:                 {},
+                  attributes:               attributes,
                   belongs_to:               belongs_to,
                   has_one:                  has_one,
                   has_many:                 has_many,
@@ -755,13 +756,16 @@ var Model = function(name, options) {
                 }
   );
 
-  jQuery.extend(model.storage, Model.Storage);
+  jQuery.extend(model.storage,  Model.Storage     );
+  jQuery.extend(model.validate, Model.Validations );
 
   jQuery.extend(model.prototype,
                 Model.InstanceMethods,
                 Model.Associations,
                 Model.Dirty,
                 instance_methods);
+
+  model.validate.set_rules(validation_rules);
 
   model.add_reflections_for_self();
 
@@ -1016,27 +1020,6 @@ Model.Associations = {
 
 Model.ClassMethods = {
 
-
-  valid_required_attrs: function(model, attrs){
-    var required_attrs, key, obj;
-
-    required_attrs = {};
-    $.each(this.required_attrs, function(i,v){ required_attrs[v] = undefined; });
-    for(key in required_attrs){
-      if (required_attrs.hasOwnProperty(key)) {
-        if(typeof model.attrs[key] == 'undefined'){
-          obj = {};
-          obj[key] = 'is required';
-          model.errors.push(obj);
-        } else if(model.attrs[key] === ''){
-          obj = {};
-          obj[key] = 'cannot be blank';
-          model.errors.push(obj);
-        }
-      }
-    }
-  },
-
   all: function() {
     return this._model_items;
   },
@@ -1248,7 +1231,7 @@ Model.InstanceMethods = {
     if(this.constructor.validations){
       this.constructor.validations(this, this.attrs);
     }
-    this.constructor.valid_required_attrs(this, this.attrs);
+    this.constructor.validate.validate_rules(this);
     if(!options.skip_callbacks){ this.constructor.trigger('after_validation', [this]); }
     return this.errors.length < 1;
   },
@@ -1363,7 +1346,6 @@ Model.Storage = {
     $.each(engines, function(i,engine){
       if(engine.supported()){
         self.engine = engine;
-        console.log(self);
         return false;
       }else{
         engines_tried.push(engine.description);
@@ -1600,6 +1582,54 @@ Model.Storage.Session = {
       }
     }
     return value;
+  }
+
+};
+/*global Model: false */
+
+Model.Validations = {
+
+  set_rules: function(rules){
+    this.rules = rules;
+  },
+
+  validate_rules: function(model){
+    var self = this;
+    $.each(this.rules, function(rule, attributes){
+      if (!$.isArray(attributes)) {
+        attributes = [attributes];
+      }
+      $.each(attributes, function(i, attribute){
+        self[rule](model, attribute, model.attrs[attribute]);
+      });
+    });
+  },
+
+  presence_of: function(model, attribute, value){
+    var error_message;
+    if(typeof value == 'undefined'){
+      this.add_error(model, attribute, 'is required');
+    } else if(value === ''){
+      this.add_error(model, attribute, 'cannot be blank');
+    }
+  },
+
+  uniqueness_of: function(model, attribute, value){
+    var query, records, error_message;
+    query             = {};
+    query[attribute]  = value;
+    records = model.constructor.find(query);
+    if(records.length > 0){
+      if($.grep(records, function(o){ return o != model; }).length > 0){
+        this.add_error(model, attribute, 'must be unique');
+      }
+    }
+  },
+
+  add_error: function(model, attribute, message){
+    var error_message = {};
+    error_message[attribute] = message;
+    model.errors.push(error_message);
   }
 
 };
