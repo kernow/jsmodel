@@ -1,6 +1,6 @@
 var Model = function(name, options) {
   var class_methods, instance_methods, required_attrs, default_attrs, belongs_to;
-  var has_one, has_many, has_and_belongs_to_many, model;
+  var has_one, has_many, has_and_belongs_to_many, model, validation_rules;
   
   options                 = options                         || {};
   class_methods           = options.class_methods           || {};
@@ -11,6 +11,14 @@ var Model = function(name, options) {
   has_one                 = options.has_one                 || {};
   has_many                = options.has_many                || {};
   has_and_belongs_to_many = options.has_and_belongs_to_many || {};
+  
+  validation_rules = {};
+  if (options.validates_uniqueness_of) {
+    validation_rules.uniqueness_of = options.validates_uniqueness_of;
+  }
+  if (options.validates_presence_of) {
+    validation_rules.presence_of = options.validates_presence_of;
+  }
   
   model = function(attributes, options){
     var self, key;
@@ -32,7 +40,7 @@ var Model = function(name, options) {
     });
     
     $.each(this.constructor.default_attrs, function(i,v){
-      if(!attributes[v]){
+      if(typeof attributes[v] == 'undefined'){
         attributes[v] = undefined;
       }
     });
@@ -96,6 +104,7 @@ var Model = function(name, options) {
                 Model.Reflections,
                 class_methods,
                 { storage:                  {},
+                  validate:                 {},
                   required_attrs:           required_attrs,
                   default_attrs:            default_attrs,
                   belongs_to:               belongs_to,
@@ -108,7 +117,8 @@ var Model = function(name, options) {
                 }
   );
   
-  jQuery.extend(model.storage, Model.Storage);
+  jQuery.extend(model.storage,  Model.Storage     );
+  jQuery.extend(model.validate, Model.Validations );
   
   // add instance methods
   jQuery.extend(model.prototype,
@@ -116,6 +126,9 @@ var Model = function(name, options) {
                 Model.Associations,
                 Model.Dirty,
                 instance_methods);
+  
+  // set the models validation rules
+  model.validate.set_rules(validation_rules);
   
   // add reflections
   model.add_reflections_for_self();
