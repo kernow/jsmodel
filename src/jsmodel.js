@@ -56,8 +56,8 @@ var Model = function(name, options) {
     });
     
     // create has_many associations
-    $.each(this.constructor.has_many, function(k,v){
-      self.add_has_many(k);
+    $.each(this.constructor.has_many, function(name, options){
+      self.add_has_many(name, options);
     });
     
     // create has_and_belongs_to_many associations
