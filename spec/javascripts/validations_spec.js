@@ -86,4 +86,128 @@ describe("validations", function() {
     
   }); // end describe
   
+  describe("contitions", function() {
+    
+    describe("when", function() {
+      
+      beforeEach(function() {
+        User = Model('user', {
+          attributes: ['first_name', 'last_name'],
+          validates_presence_of: {  last_name: {},
+                                    first_name: {
+                                      when: function(model){
+                                        return model.get_last_name() == 'I need a first name';
+                                      }
+                                    }
+                                  }
+        });
+      }); // end before
+    
+      it("should be valid when first name and last name are present", function() {
+        var jamie = new User({ first_name: 'jamie', last_name: 'dyer' });
+        expect(jamie.valid()).toBeTruthy();
+      }); // end it
+    
+      it("should be valid when first name is missing", function() {
+        var jamie = new User({ last_name: 'dyer' });
+        expect(jamie.valid()).toBeTruthy();
+      }); // end it
+    
+      it("should be invalid when last name is missing", function() {
+        var jamie = new User({ first_name: 'jamie' });
+        expect(jamie.valid()).toBeFalsy();
+      }); // end it
+    
+      it("should be invalid when first name is missing but last name is set to 'I need a first name'", function() {
+        var jamie = new User({ last_name: 'I need a first name' });
+        expect(jamie.valid()).toBeFalsy();
+      }); // end it
+    
+    }); // end describe
+    
+    describe("unless", function() {
+      
+      beforeEach(function() {
+        User = Model('user', {
+          attributes: ['first_name', 'last_name'],
+          validates_presence_of: {  last_name: {},
+                                    first_name: {
+                                      unless: function(model){
+                                        return model.get_last_name() == 'I have no first name!';
+                                      }
+                                    }
+                                  }
+        });
+      }); // end before
+    
+      it("should be valid when first name and last name are present", function() {
+        var jamie = new User({ first_name: 'jamie', last_name: 'dyer' });
+        expect(jamie.valid()).toBeTruthy();
+      }); // end it
+    
+      it("should be invalid when first name is missing", function() {
+        var jamie = new User({ last_name: 'dyer' });
+        expect(jamie.valid()).toBeFalsy();
+      }); // end it
+    
+      it("should be invalid when last name is missing", function() {
+        var jamie = new User({ first_name: 'jamie' });
+        expect(jamie.valid()).toBeFalsy();
+      }); // end it
+    
+      it("should be valid when first name is missing but last name is set to 'I have no first name!'", function() {
+        var jamie = new User({ last_name: 'I have no first name!' });
+        expect(jamie.valid()).toBeTruthy();
+      }); // end it
+    
+    }); // end describe
+    
+    describe("multiple contitions", function() {
+      
+      beforeEach(function() {
+        User = Model('user', {
+          attributes: ['first_name', 'last_name'],
+          validates_presence_of: {  last_name: {},
+                                    first_name: {
+                                      when: function(model){
+                                        return model.get_last_name() == 'I need a first name';
+                                      },
+                                      unless: function(model){
+                                        return model.get_last_name() == 'I have no first name!';
+                                      }
+                                    }
+                                  }
+        });
+        
+        it("should be valid when first name and last name are present", function() {
+          var jamie = new User({ first_name: 'jamie', last_name: 'dyer' });
+          expect(jamie.valid()).toBeTruthy();
+        }); // end it
+        
+        it("should be invalid when first name is missing", function() {
+          var jamie = new User({ last_name: 'dyer' });
+          expect(jamie.valid()).toBeFalsy();
+        }); // end it
+        
+        it("should be invalid when last name is missing", function() {
+          var jamie = new User({ first_name: 'jamie' });
+          expect(jamie.valid()).toBeFalsy();
+        }); // end it
+        
+        it("should be invalid when first name is missing but last name is set to 'I need a first name'", function() {
+          var jamie = new User({ last_name: 'I need a first name' });
+          expect(jamie.valid()).toBeFalsy();
+        }); // end it
+        
+        it("should be valid when first name is missing but last name is set to 'I have no first name!'", function() {
+          var jamie = new User({ last_name: 'I have no first name!' });
+          expect(jamie.valid()).toBeTruthy();
+        }); // end it
+        
+      }); // end before
+      
+    }); // end describe
+    
+  }); // end describe
+  
 }); // end describe
