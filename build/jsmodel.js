@@ -700,12 +700,12 @@ var Model = function(name, options) {
       }
     }
 
-    $.each(this.constructor.belongs_to, function(k,v){
-      self.add_belongs_to(k);
+    $.each(this.constructor.belongs_to, function(name, options){
+      self.add_belongs_to(name, options);
     });
 
-    $.each(this.constructor.has_one, function(k,v){
-      self.add_has_one(k);
+    $.each(this.constructor.has_one, function(name, options){
+      self.add_has_one(name, options);
     });
 
     $.each(this.constructor.has_many, function(name, options){
@@ -793,157 +793,172 @@ Model._remove = function(name){
 
 Model.Associations = {
 
-  add_belongs_to: function(k) {
-    this['get_'+k] = function(){
-      return Model.find_by_name(k).find({ id: this.attrs[k+'_id'] })[0] || undefined;
+  add_belongs_to: function(name, options) {
+    var associated_model, class_name, foreign_key;
+
+    options     = options             || {};
+    class_name  = options.class_name  || name.singularize();
+    foreign_key = options.foreign_key || name + '_id';
+
+    associated_model = Model.find_by_name(class_name);
+
+    this['get_'+name] = function(){
+      return associated_model.find({ id: this.attrs[foreign_key] })[0] || undefined;
     };
-    this['get_'+k+'_id'] = function(){
-      return this.attrs['get_'+k+'_id'];
+    this['get_'+name+'_id'] = function(){
+      return this.attrs['get_'+name+'_id'];
     };
-    this['set_'+k] = function(model){
-      if(this.attrs[k+'_id'] != model.id()){
-        this.will_change(k+'_id');
+    this['set_'+name] = function(model){
+      if(this.attrs[foreign_key] != model.id()){
+        this.will_change(name+'_id');
       }
-      this.attrs[k+'_id'] = model.id();
+      this.attrs[foreign_key] = model.id();
     };
-    this['set_'+k+'_id'] = function(v){
-      if(this.attrs[k+'_id'] != v){
-        this.will_change(k+'_id');
+    this['set_'+name+'_id'] = function(v){
+      if(this.attrs[foreign_key] != v){
+        this.will_change(name+'_id');
       }
-      this.attrs[k+'_id'] = v;
+      this.attrs[foreign_key] = v;
     };
   },
 
-  add_has_one: function(k) {
-    this['get_'+k] = function(){
-      var obj;
+  add_has_one: function(name, options) {
+    var associated_model, class_name, foreign_key;
 
-      obj = {};
-      obj[this.model_name()+'_id'] = this.id();
-      return Model.find_by_name(k).find(obj)[0];
-    };
-    this['set_'+k] = function(model){
-      var association;
+    options     = options             || {};
+    class_name  = options.class_name  || name;
+    foreign_key = options.foreign_key || this.model_name() + '_id';
 
-      association = this['get_'+k]();
-      if(association){
-        association['set_'+this.model_name()+'_id'](undefined);
-      }
-      if(model !== undefined){
-        model['set_'+this.model_name()+'_id'](this.id());
-      }
-    };
-  },
-
-  add_has_many: function(name, options) {
-    var self, associated_model;
-
-    options             = options             || {};
-    options.class_name  = options.class_name  || name.singularize();
-
-    self = this;
-    associated_model = Model.find_by_name(options.class_name);
+    associated_model = Model.find_by_name(class_name);
 
     this['get_'+name] = function(){
       var obj;
 
       obj = {};
-      obj[this.model_name()+'_id'] = this.id();
+      obj[foreign_key] = this.id();
+      return associated_model.find(obj)[0];
+    };
+    this['set_'+name] = function(model){
+      var association;
+
+      association = this['get_'+name]();
+      if(association){
+        association['set_' + foreign_key](undefined);
+      }
+      if(model !== undefined){
+        model['set_' + foreign_key](this.id());
+      }
+    };
+  },
+
+  add_has_many: function(name, options) {
+    var self, associated_model, class_name, foreign_key;
+
+    options     = options             || {};
+    class_name  = options.class_name  || name.singularize();
+    foreign_key = options.foreign_key || this.model_name() + '_id';
+
+    self = this;
+    associated_model = Model.find_by_name(class_name);
+
+    this['get_'+name] = function(){
+      var obj;
+      obj = {};
+      obj[foreign_key] = this.id();
       return associated_model.find(obj);
     };
     this['set_'+name] = function(models){
       var obj;
-
       obj = {};
-      obj[this.model_name()+'_id'] = this.id();
+      obj[foreign_key] = this.id();
       $.each(associated_model.find(obj), function(i,model){
-        model['set_'+self.model_name()+'_id'](undefined);
+        model['set_' + foreign_key](undefined);
       });
       this['add_'+name](models);
     };
     this['add_'+name] = function(models){
       $.each(models, function(i,model){
-        model['set_'+self.model_name()+'_id'](self.id());
+        model['set_' + foreign_key](self.id());
       });
     };
     this['remove_'+name] = function(models){
       $.each(models, function(i,model){
-        model['set_'+self.model_name()+'_id'](undefined);
+        model['set_' + foreign_key](undefined);
       });
     };
   },
 
-  add_has_and_belongs_to_many: function(k){
+  add_has_and_belongs_to_many: function(name){
     var self;
 
     self = this;
-    this.attrs[k+'_ids'] = [];
+    this.attrs[name+'_ids'] = [];
 
-    this['get_'+k] = function(){
-      return $.map(this.attrs[k+'_ids'], function(id,i){ return Model.find_by_name(k.singularize()).find({ id: id })[0]; });
+    this['get_'+name] = function(){
+      return $.map(this.attrs[name+'_ids'], function(id,i){ return Model.find_by_name(name.singularize()).find({ id: id })[0]; });
     };
-    this['get_'+k+'_ids'] = function(){
-      return this.attrs[k+'_ids'];
+    this['get_'+name+'_ids'] = function(){
+      return this.attrs[name+'_ids'];
     };
-    this['set_'+k] = function(models){
+    this['set_'+name] = function(models){
       var new_ids, obj;
 
       new_ids = $.map(models, function(model,i){ return model.id(); });
-      if(this.attrs[k+'_ids'] != new_ids){
-        this.will_change(k+'_ids');
+      if(this.attrs[name+'_ids'] != new_ids){
+        this.will_change(name+'_ids');
       }
-      this.attrs[k+'_ids'] = new_ids;
+      this.attrs[name+'_ids'] = new_ids;
 
       obj = {};
       obj[this.model_name().pluralize()+'_ids'] = function(r){ return $.inArray(self.id(), r) > -1; };
-      $.each(Model.find_by_name(k.singularize()).find(obj), function(i,model){
+      $.each(Model.find_by_name(name.singularize()).find(obj), function(i,model){
         model['remove_'+self.model_name().pluralize()+'_ids']([self.id()]);
       });
       $.each(models, function(i,model){
         model['add_'+self.model_name().pluralize()+'_id'](self.id());
       });
     };
-    this['set_'+k+'_ids'] = function(ids){
-      if(this.attrs[k+'_ids'] != ids){
-        this.will_change(k+'_ids');
+    this['set_'+name+'_ids'] = function(ids){
+      if(this.attrs[name+'_ids'] != ids){
+        this.will_change(name+'_ids');
       }
-      this.attrs[k+'_ids'] = ids;
+      this.attrs[name+'_ids'] = ids;
     };
-    this['add_'+k] = function(models){
+    this['add_'+name] = function(models){
       $.each(models, function(i,model){
-        if($.inArray(model.id(), self.attrs[k+'_ids']) < 0){
-          self.will_change(k+'_ids');
-          self.attrs[k+'_ids'].push(model.id());
+        if($.inArray(model.id(), self.attrs[name+'_ids']) < 0){
+          self.will_change(name+'_ids');
+          self.attrs[name+'_ids'].push(model.id());
         }
         model['add_'+self.model_name().pluralize()+'_id'](self.id());
       });
     };
-    this['add_'+k+'_id'] = function(id){
-      if($.inArray(id, self.attrs[k+'_ids']) < 0){
-        this.will_change(k+'_ids');
-        this.attrs[k+'_ids'].push(id);
+    this['add_'+name+'_id'] = function(id){
+      if($.inArray(id, self.attrs[name+'_ids']) < 0){
+        this.will_change(name+'_ids');
+        this.attrs[name+'_ids'].push(id);
       }
     };
-    this['remove_'+k] = function(models){
+    this['remove_'+name] = function(models){
       $.each(models, function(i,model){
         var pos;
 
-        pos = $.inArray(model.id(), self.attrs[k+'_ids']);
+        pos = $.inArray(model.id(), self.attrs[name+'_ids']);
         if(pos > -1){
-          self.will_change(k+'_ids');
-          self.attrs[k+'_ids'].splice(pos,1);
+          self.will_change(name+'_ids');
+          self.attrs[name+'_ids'].splice(pos,1);
         }
         model['remove_'+self.model_name().pluralize()+'_ids']([self.id()]);
       });
     };
-    this['remove_'+k+'_ids'] = function(ids){
+    this['remove_'+name+'_ids'] = function(ids){
       $.each(ids, function(i,id){
         var pos;
 
-        pos = $.inArray(id, self.attrs[k+'_ids']);
+        pos = $.inArray(id, self.attrs[name+'_ids']);
         if(pos > -1){
-          self.will_change(k+'_ids');
-          self.attrs[k+'_ids'].splice(pos,1);
+          self.will_change(name+'_ids');
+          self.attrs[name+'_ids'].splice(pos,1);
         }
       });
     };
