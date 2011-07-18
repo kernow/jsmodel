@@ -46,8 +46,8 @@ var Model = function(name, options) {
     }
     
     // create belongs_to associations
-    $.each(this.constructor.belongs_to, function(k,v){
-      self.add_belongs_to(k);
+    $.each(this.constructor.belongs_to, function(name, options){
+      self.add_belongs_to(name, options);
     });
     
     // create has_one associations

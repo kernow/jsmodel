@@ -12,55 +12,118 @@ describe("associations", function() {
   }); // end after
   
   describe("belongs_to", function() {
-
-    beforeEach(function() {
-      User = Model('user', {
-        belongs_to: { room: {}}
-      });
-      Room = Model('room');
-      
-      jamie = new User({ name: 'Jamie Dyer' });
-      frank = new User({ name: 'Frank Spencer' });
-      eddie = new User({ name: 'Eddie Vedder' });
-      
-      pjc_room = new Room({ name: 'Pearl Jam concert' });
-      diy_room = new Room({ name: 'DIY Enthusiasts' });
-    });
     
-    it("should return undefined for the for the room a user belongs to", function() {
-      expect(jamie.get_room()).toBeUndefined();
-      expect(frank.get_room()).toBeUndefined();
-      expect(eddie.get_room()).toBeUndefined();
-    }); // end it
-    
-    it("should return the room a user belongs to", function() {
-      jamie.set_room(pjc_room);
-      eddie.set_room(pjc_room);
-      expect(jamie.get_room().get_name()).toEqual('Pearl Jam concert');
-      expect(eddie.get_room().get_name()).toEqual('Pearl Jam concert');
-      expect(frank.get_room()).toBeUndefined();
-      frank.set_room(diy_room);
-      expect(frank.get_room().get_name()).toEqual('DIY Enthusiasts');
-    }); // end it
-    
-    it("should be able to change the room a user belongs to", function() {
-      jamie.set_room(pjc_room);
-      expect(jamie.get_room().get_name()).toEqual('Pearl Jam concert');
-      jamie.set_room(diy_room);
-      expect(jamie.get_room().get_name()).toEqual('DIY Enthusiasts');
-    }); // end it
-    
-    describe("at creation", function() {
-      
-      var sandy;
+    describe("vanilla", function() {
       
       beforeEach(function() {
-        sandy = new User({ name: 'Sandy', room: pjc_room });
-      }); // end before
-      
-      it("should be able to set the room when creating a user", function() {
-        expect(sandy.get_room().get_name()).toEqual('Pearl Jam concert');
+        User = Model('user', {
+          belongs_to: { room: {}}
+        });
+        Room = Model('room');
+
+        jamie = new User({ name: 'Jamie Dyer' });
+        frank = new User({ name: 'Frank Spencer' });
+        eddie = new User({ name: 'Eddie Vedder' });
+
+        pjc_room = new Room({ name: 'Pearl Jam concert' });
+        diy_room = new Room({ name: 'DIY Enthusiasts' });
+      });
+
+      it("should return undefined for the for the room a user belongs to", function() {
+        expect(jamie.get_room()).toBeUndefined();
+        expect(frank.get_room()).toBeUndefined();
+        expect(eddie.get_room()).toBeUndefined();
       }); // end it
+
+      it("should return the room a user belongs to", function() {
+        jamie.set_room(pjc_room);
+        eddie.set_room(pjc_room);
+        expect(jamie.get_room().get_name()).toEqual('Pearl Jam concert');
+        expect(eddie.get_room().get_name()).toEqual('Pearl Jam concert');
+        expect(frank.get_room()).toBeUndefined();
+        frank.set_room(diy_room);
+        expect(frank.get_room().get_name()).toEqual('DIY Enthusiasts');
+      }); // end it
+
+      it("should be able to change the room a user belongs to", function() {
+        jamie.set_room(pjc_room);
+        expect(jamie.get_room().get_name()).toEqual('Pearl Jam concert');
+        jamie.set_room(diy_room);
+        expect(jamie.get_room().get_name()).toEqual('DIY Enthusiasts');
+      }); // end it
+
+      describe("at creation", function() {
+
+        var sandy;
+
+        beforeEach(function() {
+          sandy = new User({ name: 'Sandy', room: pjc_room });
+        }); // end before
+
+        it("should be able to set the room when creating a user", function() {
+          expect(sandy.get_room().get_name()).toEqual('Pearl Jam concert');
+        }); // end it
+
+      }); // end describe
+      
+    }); // end describe
+    
+    describe("options", function() {
+      
+      describe("class_name", function() {
+        
+        beforeEach(function() {
+          User = Model('user', {
+            belongs_to: { cool_room: { class_name: 'room' }}
+          });
+          Room = Model('room');
+
+          jamie = new User({ name: 'Jamie Dyer' });
+          frank = new User({ name: 'Frank Spencer' });
+          eddie = new User({ name: 'Eddie Vedder' });
+
+          pjc_room = new Room({ name: 'Pearl Jam concert' });
+          diy_room = new Room({ name: 'DIY Enthusiasts' });
+        });
+
+        it("should return undefined for the for the cool_room a user belongs to", function() {
+          expect(jamie.get_cool_room()).toBeUndefined();
+          expect(frank.get_cool_room()).toBeUndefined();
+          expect(eddie.get_cool_room()).toBeUndefined();
+        }); // end it
+
+        it("should return the cool_room a user belongs to", function() {
+          jamie.set_cool_room(pjc_room);
+          eddie.set_cool_room(pjc_room);
+          expect(jamie.get_cool_room().get_name()).toEqual('Pearl Jam concert');
+          expect(eddie.get_cool_room().get_name()).toEqual('Pearl Jam concert');
+          expect(frank.get_cool_room()).toBeUndefined();
+          frank.set_cool_room(diy_room);
+          expect(frank.get_cool_room().get_name()).toEqual('DIY Enthusiasts');
+        }); // end it
+
+        it("should be able to change the cool_room a user belongs to", function() {
+          jamie.set_cool_room(pjc_room);
+          expect(jamie.get_cool_room().get_name()).toEqual('Pearl Jam concert');
+          jamie.set_cool_room(diy_room);
+          expect(jamie.get_cool_room().get_name()).toEqual('DIY Enthusiasts');
+        }); // end it
+
+        describe("at creation", function() {
+
+          var sandy;
+
+          beforeEach(function() {
+            sandy = new User({ name: 'Sandy', cool_room: pjc_room });
+          }); // end before
+
+          it("should be able to set the cool_room when creating a user", function() {
+            expect(sandy.get_cool_room().get_name()).toEqual('Pearl Jam concert');
+          }); // end it
+
+        }); // end describe
+        
+      }); // end describe
       
     }); // end describe
     
