@@ -3,32 +3,33 @@
 Model.Associations = {
   
   add_belongs_to: function(name, options) {
-    var associated_model, class_name;
+    var associated_model, class_name, foreign_key;
     
     options     = options             || {};
     class_name  = options.class_name  || name.singularize();
+    foreign_key = options.foreign_key || name + '_id';
     
     associated_model = Model.find_by_name(class_name);
     
     this['get_'+name] = function(){
-      return associated_model.find({ id: this.attrs[name+'_id'] })[0] || undefined;
+      return associated_model.find({ id: this.attrs[foreign_key] })[0] || undefined;
     };
     this['get_'+name+'_id'] = function(){
       return this.attrs['get_'+name+'_id'];
     };
     this['set_'+name] = function(model){
-      if(this.attrs[name+'_id'] != model.id()){
+      if(this.attrs[foreign_key] != model.id()){
         this.will_change(name+'_id');
       }
       // set listener on associated model ?
-      this.attrs[name+'_id'] = model.id();
+      this.attrs[foreign_key] = model.id();
     };
     this['set_'+name+'_id'] = function(v){
-      if(this.attrs[name+'_id'] != v){
+      if(this.attrs[foreign_key] != v){
         this.will_change(name+'_id');
       }
       // set listener on associated model ?
-      this.attrs[name+'_id'] = v;
+      this.attrs[foreign_key] = v;
     };
   },
   

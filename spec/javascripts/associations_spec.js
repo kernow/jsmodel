@@ -125,6 +125,61 @@ describe("associations", function() {
         
       }); // end describe
       
+      describe("foreign_key", function() {
+        
+        beforeEach(function() {
+          User = Model('user', {
+            belongs_to: { room: { foreigen_key: 'cool_room_id' }}
+          });
+          Room = Model('room');
+
+          jamie = new User({ name: 'Jamie Dyer' });
+          frank = new User({ name: 'Frank Spencer' });
+          eddie = new User({ name: 'Eddie Vedder' });
+
+          pjc_room = new Room({ name: 'Pearl Jam concert' });
+          diy_room = new Room({ name: 'DIY Enthusiasts' });
+        });
+
+        it("should return undefined for the for the room a user belongs to", function() {
+          expect(jamie.get_room()).toBeUndefined();
+          expect(frank.get_room()).toBeUndefined();
+          expect(eddie.get_room()).toBeUndefined();
+        }); // end it
+
+        it("should return the room a user belongs to", function() {
+          jamie.set_room(pjc_room);
+          eddie.set_room(pjc_room);
+          expect(jamie.get_room().get_name()).toEqual('Pearl Jam concert');
+          expect(eddie.get_room().get_name()).toEqual('Pearl Jam concert');
+          expect(frank.get_room()).toBeUndefined();
+          frank.set_room(diy_room);
+          expect(frank.get_room().get_name()).toEqual('DIY Enthusiasts');
+        }); // end it
+
+        it("should be able to change the room a user belongs to", function() {
+          jamie.set_room(pjc_room);
+          expect(jamie.get_room().get_name()).toEqual('Pearl Jam concert');
+          jamie.set_room(diy_room);
+          expect(jamie.get_room().get_name()).toEqual('DIY Enthusiasts');
+        }); // end it
+
+        describe("at creation", function() {
+
+          var sandy;
+
+          beforeEach(function() {
+            sandy = new User({ name: 'Sandy', room: pjc_room });
+          }); // end before
+
+          it("should be able to set the room when creating a user", function() {
+            expect(sandy.get_room().get_name()).toEqual('Pearl Jam concert');
+          }); // end it
+
+        }); // end describe
+        
+      }); // end describe
+      
     }); // end describe
     
   }); // end describe
