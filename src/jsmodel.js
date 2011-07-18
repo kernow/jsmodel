@@ -2,14 +2,14 @@ var Model = function(name, options) {
   var class_methods, instance_methods, attributes, belongs_to;
   var has_one, has_many, has_and_belongs_to_many, model, validation_rules;
   
-  options                 = options                         || {};
-  class_methods           = options.class_methods           || {};
-  instance_methods        = options.instance_methods        || {};
-  attributes              = options.attributes              || [];
-  belongs_to              = options.belongs_to              || {};
-  has_one                 = options.has_one                 || {};
-  has_many                = options.has_many                || {};
-  has_and_belongs_to_many = options.has_and_belongs_to_many || {};
+  options                 = options                                                 || {};
+  class_methods           = options.class_methods                                   || {};
+  instance_methods        = options.instance_methods                                || {};
+  attributes              = options.attributes                                      || [];
+  belongs_to              = Model.Options.parse( options.belongs_to )               || {};
+  has_one                 = Model.Options.parse( options.has_one )                  || {};
+  has_many                = Model.Options.parse( options.has_many )                 || {};
+  has_and_belongs_to_many = Model.Options.parse( options.has_and_belongs_to_many )  || {};
   
   validation_rules = {};
   if (options.validates_uniqueness_of) {

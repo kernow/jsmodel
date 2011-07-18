@@ -44,12 +44,12 @@ describe("dirty", function() {
     beforeEach(function() {
       User = Model('user', {
         attributes:  ['name', 'age', 'weight'],
-        belongs_to: { room: {} }
+        belongs_to: 'room'
       });
       
       Room = Model('room', {
         attributes:  ['name', 'number'],
-        has_many: { users: {} }
+        has_many: 'users'
       });
       
       user = new User({ name: 'Jamie', age: 33, weight: 'nothing' });
@@ -87,12 +87,12 @@ describe("dirty", function() {
     beforeEach(function() {
       User = Model('user', {
         attributes:  ['name', 'age', 'weight'],
-        has_and_belongs_to_many: { rooms: {} }
+        has_and_belongs_to_many: 'rooms'
       });
       
       Room = Model('room', {
         attributes:  ['name', 'number'],
-        has_and_belongs_to_many: { users: {} }
+        has_and_belongs_to_many: 'users'
       });
       
       user = new User({ name: 'Jamie', age: 33, weight: 'nothing' });

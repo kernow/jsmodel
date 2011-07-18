@@ -17,7 +17,7 @@ describe("associations", function() {
       
       beforeEach(function() {
         User = Model('user', {
-          belongs_to: { room: {}}
+          belongs_to: 'room'
         });
         Room = Model('room');
 
@@ -193,7 +193,7 @@ describe("associations", function() {
           attributes: ['room_id']
         });
         Room = Model('room', {
-          has_one: { user: {}}
+          has_one: 'user'
         });
 
         jamie = new User({ name: 'Jamie Dyer' });
@@ -390,13 +390,13 @@ describe("associations", function() {
           attributes: ['room_id']
         });
         Room = Model('room', {
-          has_many: { users: {}}
+          has_many: 'users' // ERROR
         });
-
+        
         jamie = new User({ name: 'Jamie Dyer' });
         frank = new User({ name: 'Frank Spencer' });
         eddie = new User({ name: 'Eddie Vedder' });
-
+        
         pjc_room = new Room({ name: 'Pearl Jam concert' });
         diy_room = new Room({ name: 'DIY Enthusiasts' });
       });
@@ -713,14 +713,14 @@ describe("associations", function() {
     
     beforeEach(function() {
       User = Model('user', {
-        belongs_to: { room: {}},
-        has_many:   { keycards: {}}
+        belongs_to: 'room',
+        has_many:   'keycards'
       });
       Room = Model('room', {
-        has_many: { users: {}, keycards: {}}
+        has_many: ['users', 'keycards']
       });
       Keycard = Model('keycard', {
-        belongs_to: { user: {}, room: {}}
+        belongs_to: ['user', 'room']
       });
       
       jamie    = new User({ name: 'Jamie Dyer' });
@@ -759,10 +759,10 @@ describe("associations", function() {
     
     beforeEach(function() {
       User = Model('user', {
-        has_and_belongs_to_many: { rooms: {}}
+        has_and_belongs_to_many: 'rooms'
       });
       Room = Model('room', {
-        has_and_belongs_to_many: { users: {}}
+        has_and_belongs_to_many: 'users'
       });
       
       jamie = new User({ name: 'Jamie Dyer' });
@@ -889,10 +889,10 @@ describe("associations", function() {
       
       beforeEach(function() {
         User = Model('user', {
-          belongs_to: { room: {}}
+          belongs_to: 'room'
         });
         Room = Model('room', {
-          has_many: { users: {}}
+          has_many: 'users'
         });
 
         jamie = new User({ name: 'Jamie Dyer' });
@@ -917,10 +917,10 @@ describe("associations", function() {
       
       beforeEach(function() {
         User = Model('user', {
-          has_and_belongs_to_many: { rooms: {}}
+          has_and_belongs_to_many: 'rooms'
         });
         Room = Model('room', {
-          has_and_belongs_to_many: { users: {}}
+          has_and_belongs_to_many: 'users'
         });
 
         jamie = new User({ name: 'Jamie Dyer' });
@@ -967,10 +967,10 @@ describe("associations", function() {
       
       beforeEach(function() {
         User = Model('user', {
-          belongs_to: { room: {}}
+          belongs_to: 'room'
         });
         Room = Model('room', {
-          has_many: { users: {}}
+          has_many: 'users'
         });
 
         jamie = new User({ name: 'Jamie Dyer' });
@@ -1007,10 +1007,10 @@ describe("associations", function() {
       
       beforeEach(function() {
         User = Model('user', {
-          has_and_belongs_to_many: { rooms: {}}
+          has_and_belongs_to_many: 'rooms'
         });
         Room = Model('room', {
-          has_and_belongs_to_many: { users: {}}
+          has_and_belongs_to_many: 'users'
         });
 
         jamie = new User({ name: 'Jamie Dyer' });
