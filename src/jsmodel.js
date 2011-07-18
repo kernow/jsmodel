@@ -51,8 +51,8 @@ var Model = function(name, options) {
     });
     
     // create has_one associations
-    $.each(this.constructor.has_one, function(k,v){
-      self.add_has_one(k);
+    $.each(this.constructor.has_one, function(name, options){
+      self.add_has_one(name, options);
     });
     
     // create has_many associations

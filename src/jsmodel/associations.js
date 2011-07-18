@@ -33,13 +33,20 @@ Model.Associations = {
     };
   },
   
-  add_has_one: function(name) {
+  add_has_one: function(name, options) {
+    var associated_model, class_name, foreign_key;
+    
+    options     = options             || {};
+    class_name  = options.class_name  || name;
+    
+    associated_model = Model.find_by_name(class_name);
+    
     this['get_'+name] = function(){
       var obj;
       
       obj = {};
       obj[this.model_name()+'_id'] = this.id();
-      return Model.find_by_name(name).find(obj)[0];
+      return associated_model.find(obj)[0];
     };
     this['set_'+name] = function(model){
       var association;
