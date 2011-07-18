@@ -344,7 +344,113 @@ describe("associations", function() {
         }); // end describe
 
       }); // end describe
+      
+      describe("foreign_key", function() {
+        
+        beforeEach(function() {
+          User = Model('user', {
+            attributes: ['cool_room_id']
+          });
+          Room = Model('room', {
+            has_many: { users: { foreign_key: 'cool_room_id' }}
+          });
 
+          jamie = new User({ name: 'Jamie Dyer' });
+          frank = new User({ name: 'Frank Spencer' });
+          eddie = new User({ name: 'Eddie Vedder' });
+
+          pjc_room = new Room({ name: 'Pearl Jam concert' });
+          diy_room = new Room({ name: 'DIY Enthusiasts' });
+        });
+
+        it("should return an emptry array when no users are associated with the room", function() {
+          expect(pjc_room.get_users()).toEqual([]);
+          expect(diy_room.get_users()).toEqual([]);
+        }); // end it
+
+        it("should return a list of users associated with a room", function() {
+          pjc_room.add_users([jamie, eddie]);
+          diy_room.add_users([frank]);
+
+          expect(pjc_room.get_users().length).toEqual(2);
+          expect(diy_room.get_users().length).toEqual(1);
+
+          expect(pjc_room.get_users()[0].get_name()).toEqual('Jamie Dyer');
+          expect(pjc_room.get_users()[1].get_name()).toEqual('Eddie Vedder');
+          expect(diy_room.get_users()[0].get_name()).toEqual('Frank Spencer');
+        }); // end it
+
+        it("should be able to change the user associated with a room", function() {
+          pjc_room.add_users([jamie, eddie]);
+          diy_room.add_users([frank]);
+          expect(pjc_room.get_users().length).toEqual(2);
+          expect(diy_room.get_users().length).toEqual(1);
+
+          pjc_room.add_users([jamie, frank, eddie]);
+          expect(pjc_room.get_users().length).toEqual(3);
+          expect(diy_room.get_users().length).toEqual(0);
+
+          expect(pjc_room.get_users()[0].get_name()).toEqual('Jamie Dyer');
+          expect(pjc_room.get_users()[1].get_name()).toEqual('Frank Spencer');
+          expect(pjc_room.get_users()[2].get_name()).toEqual('Eddie Vedder');
+        }); // end it
+
+        it("should be able to add a user association to a room", function() {
+          pjc_room.add_users([jamie, eddie]);
+          expect(pjc_room.get_users().length).toEqual(2);
+
+          pjc_room.add_users([frank]);
+          expect(pjc_room.get_users().length).toEqual(3);
+        }); // end it
+
+        it("should be able to remove a user association to a room", function() {
+          pjc_room.add_users([jamie, frank, eddie]);
+          expect(pjc_room.get_users().length).toEqual(3);
+
+          pjc_room.remove_users([frank]);
+          expect(pjc_room.get_users().length).toEqual(2);
+
+          // try to remove a user that's not in the room
+          pjc_room.remove_users([frank]);
+          expect(pjc_room.get_users().length).toEqual(2);
+
+          pjc_room.remove_users([jamie]);
+          expect(pjc_room.get_users().length).toEqual(1);
+
+          pjc_room.remove_users([eddie]);
+          expect(pjc_room.get_users().length).toEqual(0);
+
+          // try to remove a user that's not in the room
+          pjc_room.remove_users([eddie]);
+          expect(pjc_room.get_users().length).toEqual(0);
+        }); // end it
+
+        it("should be able to replace users associated with a room", function() {
+          pjc_room.set_users([jamie, frank, eddie]);
+          expect(pjc_room.get_users().length).toEqual(3);
+
+          pjc_room.set_users([]);
+          expect(pjc_room.get_users().length).toEqual(0);
+        }); // end it
+
+        describe("at creation", function() {
+
+          var awesome_room;
+
+          beforeEach(function() {
+            awesome_room = new Room({ name: 'Awesome Room', users: [jamie, eddie] });
+          }); // end before
+
+          it("should be able to set the room when creating a user", function() {
+            expect(awesome_room.get_users().length).toEqual(2);
+            expect(awesome_room.get_users()[0].get_name()).toEqual('Jamie Dyer');
+            expect(awesome_room.get_users()[1].get_name()).toEqual('Eddie Vedder');
+          }); // end it
+
+        }); // end describe
+        
+      }); // end describe
+      
     }); // end describe
     
   }); // end describe

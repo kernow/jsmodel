@@ -48,41 +48,40 @@ Model.Associations = {
   },
   
   add_has_many: function(name, options) {
-    var self, associated_model;
+    var self, associated_model, class_name, foreign_key;
     
-    options             = options             || {};
-    options.class_name  = options.class_name  || name.singularize();
+    options     = options             || {};
+    class_name  = options.class_name  || name.singularize();
+    foreign_key = options.foreign_key || this.model_name() + '_id';
     
     self = this;
-    associated_model = Model.find_by_name(options.class_name);
+    associated_model = Model.find_by_name(class_name);
     
     this['get_'+name] = function(){
       var obj;
-      
       obj = {};
-      obj[this.model_name()+'_id'] = this.id();
+      obj[foreign_key] = this.id();
       return associated_model.find(obj);
     };
     this['set_'+name] = function(models){
       var obj;
-      
       // remove all associations
       obj = {};
-      obj[this.model_name()+'_id'] = this.id();
+      obj[foreign_key] = this.id();
       $.each(associated_model.find(obj), function(i,model){
-        model['set_'+self.model_name()+'_id'](undefined);
+        model['set_' + foreign_key](undefined);
       });
       // then add the new ones
       this['add_'+name](models);
     };
     this['add_'+name] = function(models){
       $.each(models, function(i,model){
-        model['set_'+self.model_name()+'_id'](self.id());
+        model['set_' + foreign_key](self.id());
       });
     };
     this['remove_'+name] = function(models){
       $.each(models, function(i,model){
-        model['set_'+self.model_name()+'_id'](undefined);
+        model['set_' + foreign_key](undefined);
       });
     };
   },
