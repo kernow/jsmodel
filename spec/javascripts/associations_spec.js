@@ -314,6 +314,69 @@ describe("associations", function() {
         
       }); // end describe
       
+      describe("foreign_key", function() {
+        
+        beforeEach(function() {
+          User = Model('user', {
+            attributes: ['cool_room_id']
+          });
+          Room = Model('room', {
+            has_one: { user: { foreign_key: 'cool_room_id' }}
+          });
+
+          jamie = new User({ name: 'Jamie Dyer' });
+          frank = new User({ name: 'Frank Spencer' });
+          eddie = new User({ name: 'Eddie Vedder' });
+
+          pjc_room = new Room({ name: 'Pearl Jam concert' });
+          diy_room = new Room({ name: 'DIY Enthusiasts' });
+        });
+
+        it("should return undefined when no user is associated with the room", function() {
+          expect(pjc_room.get_user()).toBeUndefined();
+          expect(diy_room.get_user()).toBeUndefined();
+        }); // end it
+
+        it("should return the user associated with a room", function() {
+          pjc_room.set_user(jamie);
+          diy_room.set_user(frank);
+
+          expect(pjc_room.get_user().get_name()).toEqual('Jamie Dyer');
+          expect(diy_room.get_user().get_name()).toEqual('Frank Spencer');
+        }); // end it
+
+        it("should be able to change the user associated with a room", function() {
+          pjc_room.set_user(jamie);
+          expect(pjc_room.get_user().get_name()).toEqual('Jamie Dyer');
+
+          pjc_room.set_user(eddie);
+          expect(pjc_room.get_user().get_name()).toEqual('Eddie Vedder');
+        }); // end it
+
+        it("should be able to remove a user association to a room", function() {
+          pjc_room.set_user(jamie);
+          expect(pjc_room.get_user().get_name()).toEqual('Jamie Dyer');
+
+          pjc_room.set_user(undefined);
+          expect(pjc_room.get_user()).toBeUndefined();
+        }); // end it
+
+        describe("at creation", function() {
+
+          var awesome_room;
+
+          beforeEach(function() {
+            awesome_room = new Room({ name: 'Awesome Room', user: jamie });
+          }); // end before
+
+          it("should be able to set the room when creating a user", function() {
+            expect(awesome_room.get_user().get_name()).toEqual('Jamie Dyer');
+          }); // end it
+
+        }); // end describe
+        
+      }); // end describe
+      
     }); // end describe
     
   }); // end describe

@@ -38,6 +38,7 @@ Model.Associations = {
     
     options     = options             || {};
     class_name  = options.class_name  || name;
+    foreign_key = options.foreign_key || this.model_name() + '_id';
     
     associated_model = Model.find_by_name(class_name);
     
@@ -45,7 +46,7 @@ Model.Associations = {
       var obj;
       
       obj = {};
-      obj[this.model_name()+'_id'] = this.id();
+      obj[foreign_key] = this.id();
       return associated_model.find(obj)[0];
     };
     this['set_'+name] = function(model){
@@ -54,10 +55,10 @@ Model.Associations = {
       // find any existing assoication and remove it
       association = this['get_'+name]();
       if(association){
-        association['set_'+this.model_name()+'_id'](undefined);
+        association['set_' + foreign_key](undefined);
       }
       if(model !== undefined){
-        model['set_'+this.model_name()+'_id'](this.id());
+        model['set_' + foreign_key](this.id());
       }
     };
   },
