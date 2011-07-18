@@ -4,14 +4,11 @@ Model.Associations = {
   
   add_belongs_to: function(name, options) {
     var associated_model, class_name;
-    console.log(options);
     
     options     = options             || {};
     class_name  = options.class_name  || name.singularize();
-    console.log(class_name);
     
     associated_model = Model.find_by_name(class_name);
-    console.log(associated_model);
     
     this['get_'+name] = function(){
       return associated_model.find({ id: this.attrs[name+'_id'] })[0] || undefined;
