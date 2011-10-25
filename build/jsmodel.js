@@ -1357,7 +1357,7 @@ Model.Reflections = {
     var self;
 
     self = this;
-    $.each({ has_many: this.has_many, belongs_to: this.belongs_to, has_and_belongs_to_many: this.has_and_belongs_to_many }, function(key,association){
+    $.each({ has_one: this.has_one, has_many: this.has_many, belongs_to: this.belongs_to, has_and_belongs_to_many: this.has_and_belongs_to_many }, function(key,association){
       $.each(association, function(k,v){
         var obj;
 
