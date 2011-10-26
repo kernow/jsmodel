@@ -28,8 +28,9 @@ Model.InstanceMethods = {
       this.constructor.validations(this, this.attrs);
     }
     this.constructor.validate.validate_rules(this);
-    if(!options.skip_callbacks){ this.constructor.trigger('after_validation', [this]); }
-    return this.errors.length < 1;
+    var result = this.errors.length < 1;
+    if(result && !options.skip_callbacks){ this.constructor.trigger('after_validation', [this]); }
+    return result;
   },
 
   remove: function() {
@@ -52,26 +53,15 @@ Model.InstanceMethods = {
   
   update: function(attrs) {
     var updated, key, current_value;
-    
-    this.constructor.trigger('before_update', [this]);
-    updated = false;
     for(key in attrs){
       if (attrs.hasOwnProperty(key)) {
         current_value = this.attrs[key];
         if(current_value != attrs[key]){
           this["set_"+key](attrs[key]);
-          updated = true;
         }
       }
     }
-    if(updated){
-      if(this.save()){
-        this.constructor.trigger('after_update', [this]);
-        return true;
-      }else{
-        return false;
-      }
-    }
+    if(this.changed()){ return this.save(); }
     return true;
   },
   
@@ -79,15 +69,27 @@ Model.InstanceMethods = {
     var dirty_attributes;
     
     if(this.valid()) {
+      var create = this.state == 'new';
+      
       this.constructor.trigger('before_save', [this]);
-      if(this.state == 'new'){ // new record
-        this.constructor.add(this);
+      if(create){ // new record
+        this.constructor.trigger('before_create', [this]);
       }else{ // updating an existing record
-        this.constructor.write_to_store();
+        this.constructor.trigger('before_update', [this]);
       }
+      
+      // Save that record!
+      this.constructor.add(this);
       dirty_attributes = this.clear_dirty();
       this.save_associated_records(dirty_attributes);
+      
+      if(create){ // new record
+        this.constructor.trigger('after_create', [this]);
+      }else{ // updating an existing record
+        this.constructor.trigger('after_update', [this]);
+      }
       this.constructor.trigger('after_save', [this]);
+      
       return true;
     }else{
       return false;

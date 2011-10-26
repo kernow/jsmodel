@@ -34,7 +34,7 @@ Model.ClassMethods = {
   },
   
   is_function: function(o) {
-	  return typeof o == 'function' || Object.prototype.toString.call(o) == '[object Function]' ? true : false;
+    return typeof o == 'function' || Object.prototype.toString.call(o) == '[object Function]' ? true : false;
 	},
   
   first: function(){
@@ -44,11 +44,9 @@ Model.ClassMethods = {
   add: function(model) {
     if(model.valid({ 'skip_callbacks': true })){
       // set the model id before saving it
-      this.trigger('before_add', [model]);
-      this._model_items.push(model);
+      if(model.state == 'new'){ this._model_items.push(model); }
       this.write_to_store();
       model.state = 'saved';
-      this.trigger('after_add', [model]);
     }
   },
   
