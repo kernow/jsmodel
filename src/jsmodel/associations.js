@@ -15,7 +15,7 @@ Model.Associations = {
       return associated_model.find({ id: this.attrs[foreign_key] })[0] || undefined;
     };
     this['get_'+name+'_id'] = function(){
-      return this.attrs['get_'+name+'_id'];
+      return this.attrs[foreign_key];
     };
     this['set_'+name] = function(model){
       if(this.attrs[foreign_key] != model.id()){

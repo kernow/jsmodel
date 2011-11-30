@@ -35,6 +35,11 @@ describe("associations", function() {
         expect(eddie.get_room()).toBeUndefined();
       }); // end it
 
+      it("should set the foreign key correctly", function() {
+        jamie.set_room(pjc_room);
+        expect(jamie.get_room_id()).toEqual(pjc_room.id());
+      }); // end it
+
       it("should return the room a user belongs to", function() {
         jamie.set_room(pjc_room);
         eddie.set_room(pjc_room);
@@ -145,6 +150,11 @@ describe("associations", function() {
           expect(jamie.get_room()).toBeUndefined();
           expect(frank.get_room()).toBeUndefined();
           expect(eddie.get_room()).toBeUndefined();
+        }); // end it
+
+        it("should set the foreign key correctly", function() {
+          jamie.set_room(pjc_room);
+          expect(jamie.get_room_id()).toEqual(pjc_room.id());
         }); // end it
 
         it("should return the room a user belongs to", function() {
