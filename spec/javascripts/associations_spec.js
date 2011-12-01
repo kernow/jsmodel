@@ -242,6 +242,13 @@ describe("associations", function() {
         pjc_room.set_user(undefined);
         expect(pjc_room.get_user()).toBeUndefined();
       }); // end it
+      
+      it("should remove the assocaition id's when it's deleted", function() {
+        pjc_room.set_user(jamie);
+        expect(jamie.attrs.room_id).toEqual(pjc_room.id());
+        pjc_room.remove();
+        expect(jamie.attrs.room_id).toBeUndefined();
+      }); // end it
 
       describe("at creation", function() {
 
@@ -479,6 +486,15 @@ describe("associations", function() {
 
         pjc_room.set_users([]);
         expect(pjc_room.get_users().length).toEqual(0);
+      }); // end it
+      
+      it("should remove the assocaition id's when it's deleted", function() {
+        pjc_room.add_users([jamie, eddie]);
+        expect(jamie.attrs.room_id).toEqual(pjc_room.id());
+        expect(eddie.attrs.room_id).toEqual(pjc_room.id());
+        pjc_room.remove();
+        expect(jamie.attrs.room_id).toBeUndefined();
+        expect(eddie.attrs.room_id).toBeUndefined();
       }); // end it
       
       describe("at creation", function() {

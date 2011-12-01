@@ -239,6 +239,11 @@ Model.Associations = {
             });
             break;
             
+          case "has_one":
+            var r = self['get_'+v]();
+            r['set_'+self.model_name()+'_id'](undefined);
+            break;
+            
           case "has_and_belongs_to_many":
             $.each(self['get_'+v](), function(i,r){
               r['remove_'+self.model_name().pluralize()+'_ids']([self.id()]);
