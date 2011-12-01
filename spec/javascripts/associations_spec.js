@@ -134,7 +134,7 @@ describe("associations", function() {
         
         beforeEach(function() {
           User = Model('user', {
-            belongs_to: { room: { foreigen_key: 'cool_room_id' }}
+            belongs_to: { room: { foreign_key: 'cool_room_id' }}
           });
           Room = Model('room');
 
