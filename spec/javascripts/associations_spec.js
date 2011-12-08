@@ -249,6 +249,12 @@ describe("associations", function() {
         pjc_room.remove();
         expect(jamie.attrs.room_id).toBeUndefined();
       }); // end it
+      
+      it("should delete the record without error", function() {
+        expect(jamie.attrs.room_id).toBeUndefined();
+        pjc_room.remove();
+        expect(jamie.attrs.room_id).toBeUndefined();
+      }); // end it
 
       describe("at creation", function() {
 

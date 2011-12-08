@@ -241,7 +241,9 @@ Model.Associations = {
             
           case "has_one":
             var r = self['get_'+v]();
-            r['set_'+self.model_name()+'_id'](undefined);
+            if(r !== undefined){
+              r['set_'+self.model_name()+'_id'](undefined);
+            }
             break;
             
           case "has_and_belongs_to_many":
